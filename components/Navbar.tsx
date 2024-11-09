@@ -10,19 +10,19 @@ const PagesData = [
   },
   {
     name: "Policies",
-    link: "/policies",
+    link: "/protected/policies",
   },
   {
     name: "Forums",
-    link: "/forums",
+    link: "/protected/forums",
   },
   {
     name: "Profile",
-    link: "/profile",
+    link: "/protected/profile",
   },
   {
     name: "Representitives",
-    link: "/representitives",
+    link: "/protected/representitives",
   },
 ];
 
@@ -54,7 +54,6 @@ const NavbarLinksDesktop = () => {
 
 const NavbarLinksPhone = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [dropdowns, setDropdowns] = useState<{ [key: string]: boolean }>({});
   const [isSliding, setIsSliding] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
@@ -69,13 +68,6 @@ const NavbarLinksPhone = () => {
     } else {
       setSidebarOpen(true);
     }
-  };
-
-  const toggleDropdown = (page: string) => {
-    setDropdowns((prev) => ({
-      ...prev,
-      [page]: !prev[page],
-    }));
   };
 
   const handleClickOutside = (event: MouseEvent) => {
@@ -137,7 +129,6 @@ const NavbarLinksPhone = () => {
 
             <div className="flex flex-col">
               {PagesData.map((page) => {
-                const isOpen = dropdowns[page.name];
                 return (
                   <div key={page.name} className="group relative text-lg">
                     <div className="flex flex-row justify-between">
