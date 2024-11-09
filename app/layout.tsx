@@ -51,7 +51,7 @@ export default function RootLayout({
                   <p className="text-center">© BillBoard 2024</p>
                 </div>
 
-                {/* <ThemeSwitcher /> */}
+                <ThemeSwitcher />
               </footer>
             </div>
           </main>

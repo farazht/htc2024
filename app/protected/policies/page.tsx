@@ -120,7 +120,7 @@ export default  function Policies() {
           {filteredPolicies.map((policy) => (
             <div 
               key={policy.id} 
-              className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer"
+              className="bg-background rounded-lg shadow-md overflow-hidden cursor-pointer"
               onClick={() => router.push(`/protected/policies/policy/${policy.id}`)}
             >
               <Image

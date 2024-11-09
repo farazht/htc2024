@@ -36,7 +36,7 @@ const NavbarLinksDesktop = () => {
           <div key={page.name} className="group relative">
             <Link href={page.link}>
               <div
-                className={`text-black hover:scale-105 transition-all duration-300 p-2 lg:pr-2 md:pr-5 font-medium`}
+                className={`text-foreground hover:scale-105 transition-all duration-300 p-2 lg:pr-2 md:pr-5 font-medium`}
               >
                 {page.name}
               </div>
@@ -91,7 +91,7 @@ const NavbarLinksPhone = () => {
     <div className="items-center lg:hidden md:hidden sm:flex flex">
       <button onClick={toggleSidebar}>
         <svg
-          className="fill-black transition-all duration-300"
+          className="fill-foreground transition-all duration-300"
           width="40"
           height="40"
           viewBox="0 0 100 100"
@@ -106,10 +106,10 @@ const NavbarLinksPhone = () => {
       </button>
 
       {sidebarOpen && (
-        <div className="fixed inset-0 bg-white bg-opacity-50 z-50 ">
+        <div className="fixed inset-0 bg-background bg-opacity-50 z-50 ">
           <div
             ref={sidebarRef}
-            className={`overflow-y-auto no-scrollbar overflow-x-hidden fixed top-0 right-0 py-14 bg-white md:w-80 sm:w-64 w-64 h-full shadow-md z-50 shadow-black ${
+            className={`overflow-y-auto no-scrollbar overflow-x-hidden fixed top-0 right-0 py-14 bg-background md:w-80 sm:w-64 w-64 h-full shadow-md z-50 shadow-foreground ${
               isSliding ? "slide-out" : "slide-in"
             }`}
           >
@@ -134,7 +134,7 @@ const NavbarLinksPhone = () => {
                       >
                         <Link href={page.link}>
                           <div
-                            className={`text-black text-start hover:scale-105 transition-all duration-300 p-5 pl-14 py-3 font-medium`}
+                            className={`text-foreground text-start hover:scale-105 transition-all duration-300 p-5 pl-14 py-3 font-medium`}
                           >
                             {page.name}
                           </div>
@@ -154,8 +154,8 @@ const NavbarLinksPhone = () => {
 
 export const Navbar = () => {
   return (
-    <div className="bg-white w-full fixed border-b-2 border-black z-40">
-      <div className="p-5 px-10 m-auto max-w-7xl flex flex-row text-black justify-between">
+    <div className="bg-background w-full fixed border-b-2 border-foreground z-40">
+      <div className="p-5 px-10 m-auto max-w-7xl flex flex-row text-foreground justify-between">
         <div className="lg:hidden md:hidden sm:flex flex"></div>
         <Link href={"/"}>
           <div className="flex flex-row gap-3 items-center flex-end">
