@@ -3,6 +3,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { useRouter } from 'next/navigation'
 
 interface Policy {
   id: number
@@ -53,6 +54,8 @@ const policies: Policy[] = [
   
 
 export default  function Policies() {
+    const router = useRouter()
+  
     const [searchTerm, setSearchTerm] = useState("")
     const [selectedTopic, setSelectedTopic] = useState<string | null>(null)
     const [selectedLevel, setSelectedLevel] = useState<string | null>(null)
@@ -115,7 +118,11 @@ export default  function Policies() {
   
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {filteredPolicies.map((policy) => (
-            <div key={policy.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div 
+              key={policy.id} 
+              className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer"
+              onClick={() => router.push(`/protected/policies/policy/${policy.id}`)}
+            >
               <Image
                 src={policy.imageUrl}
                 alt={policy.title}
