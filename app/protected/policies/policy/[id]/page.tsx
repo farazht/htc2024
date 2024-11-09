@@ -1,31 +1,96 @@
-"use client"
+"use client";
 
-import { useState } from 'react'
+import { useState, FormEvent } from "react";
+import { ChevronDown, ChevronUp, ThumbsDown, ThumbsUp } from "lucide-react";
 
-export default function PolicyPage() {
-  const [comments, setComments] = useState([
-    { id: 1, author: 'User1', content: 'This is an interesting policy.', replies: [
-      { id: 2, author: 'User2', content: 'I agree, it has some good points.' },
-      { id: 3, author: 'User3', content: 'I\'m not sure about the implementation though.' }
-    ]},
-    { id: 4, author: 'User4', content: 'How will this affect small businesses?', replies: [] },
-  ])
+// Define the types for a Comment
+interface Comment {
+  id: number;
+  author: string;
+  content: string;
+  votes: number;
+  replies: Comment[];
+}
 
-  const [newComment, setNewComment] = useState('')
-  const [likes, setLikes] = useState(75)
-  const [dislikes, setDislikes] = useState(25)
+// Props for the CommentThread component
+interface CommentThreadProps {
+  comment: Comment;
+  depth?: number;
+}
 
-  const handleSubmitComment = (e: React.FormEvent) => {
-    e.preventDefault()
+// CommentThread Component
+function CommentThread({ comment, depth = 0 }: CommentThreadProps) {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [votes, setVotes] = useState(comment.votes);
+
+  const handleVote = (value: number) => {
+    setVotes(votes + value);
+  };
+
+  return (
+    <div className={`mt-4 ${depth > 0 ? "ml-8 border-l-2 border-gray-200 pl-4" : ""}`}>
+      <div className="flex items-start space-x-2">
+        <div className="flex flex-col items-center space-y-1">
+          <button onClick={() => handleVote(1)} className="text-gray-400 hover:text-blue-500">
+            <ThumbsUp size={16} />
+          </button>
+          <span className={`text-sm font-medium ${votes > 0 ? "text-blue-500" : votes < 0 ? "text-red-500" : "text-gray-500"}`}>
+            {votes}
+          </span>
+          <button onClick={() => handleVote(-1)} className="text-gray-400 hover:text-red-500">
+            <ThumbsDown size={16} />
+          </button>
+        </div>
+        <div className="flex-grow">
+          <div className="flex items-center space-x-2">
+            <span className="font-medium">{comment.author}</span>
+            <button onClick={() => setIsCollapsed(!isCollapsed)} className="text-gray-400 hover:text-gray-600">
+              {isCollapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
+            </button>
+          </div>
+          {!isCollapsed && (
+            <>
+              <p className="mt-1 text-sm">{comment.content}</p>
+              {comment.replies?.map((reply) => (
+                <CommentThread key={reply.id} comment={reply} depth={depth + 1} />
+              ))}
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Props for the PublicOpinion component
+interface PublicOpinionProps {
+  likes: number;
+  dislikes: number;
+}
+
+// PublicOpinion Component
+function PublicOpinion({ likes, dislikes }: PublicOpinionProps) {
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [newComment, setNewComment] = useState("");
+
+  const handleSubmitComment = (e: FormEvent) => {
+    e.preventDefault();
     if (newComment.trim()) {
-      setComments([...comments, { id: comments.length + 1, author: 'CurrentUser', content: newComment, replies: [] }])
-      setNewComment('')
+      const newCommentObj: Comment = {
+        id: Date.now(),
+        author: "You",
+        content: newComment,
+        votes: 0,
+        replies: []
+      };
+      setComments([...comments, newCommentObj]);
+      setNewComment("");
     }
-  }
+  };
 
-  const totalVotes = likes + dislikes
-  const likePercentage = (likes / totalVotes) * 100
-  const dislikePercentage = (dislikes / totalVotes) * 100
+  const totalVotes = likes + dislikes;
+  const likePercentage = (likes / totalVotes) * 100 || 0;
+  const dislikePercentage = (dislikes / totalVotes) * 100 || 0;
 
   return (
     <div className="min-h-screen bg-background p-8 text-foreground">
@@ -103,22 +168,13 @@ export default function PolicyPage() {
           </div>
           <div className="space-y-4">
             {comments.map((comment) => (
-              <div key={comment.id} className="border-b border-gray-200 pb-4">
-                <div className="font-semibold">{comment.author}</div>
-                <p>{comment.content}</p>
-                <div className="ml-8 mt-2 space-y-2">
-                  {comment.replies.map((reply) => (
-                    <div key={reply.id}>
-                      <div className="font-semibold">{reply.author}</div>
-                      <p>{reply.content}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <CommentThread key={comment.id} comment={comment} />
             ))}
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
+
+export default PublicOpinion;
