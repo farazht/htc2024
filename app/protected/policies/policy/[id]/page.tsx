@@ -1,16 +1,29 @@
 "use client";
 
-import { useState } from "react";
-import { ChevronDown, ChevronUp, MessageSquare, ThumbsDown, ThumbsUp } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
+import { useState, FormEvent } from "react";
+import { ChevronDown, ChevronUp, ThumbsDown, ThumbsUp } from "lucide-react";
+
+// Define the types for a Comment
+interface Comment {
+  id: number;
+  author: string;
+  content: string;
+  votes: number;
+  replies: Comment[];
+}
+
+// Props for the CommentThread component
+interface CommentThreadProps {
+  comment: Comment;
+  depth?: number;
+}
 
 // CommentThread Component
-function CommentThread({ comment, depth = 0 }) {
+function CommentThread({ comment, depth = 0 }: CommentThreadProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [votes, setVotes] = useState(comment.votes);
 
-  const handleVote = (value) => {
+  const handleVote = (value: number) => {
     setVotes(votes + value);
   };
 
@@ -38,7 +51,7 @@ function CommentThread({ comment, depth = 0 }) {
           {!isCollapsed && (
             <>
               <p className="mt-1 text-sm">{comment.content}</p>
-              {comment.replies.map((reply) => (
+              {comment.replies?.map((reply) => (
                 <CommentThread key={reply.id} comment={reply} depth={depth + 1} />
               ))}
             </>
@@ -49,11 +62,35 @@ function CommentThread({ comment, depth = 0 }) {
   );
 }
 
+// Props for the PublicOpinion component
+interface PublicOpinionProps {
+  likes: number;
+  dislikes: number;
+}
+
 // PublicOpinion Component
-function PublicOpinion({ likes, dislikes }) {
+function PublicOpinion({ likes, dislikes }: PublicOpinionProps) {
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [newComment, setNewComment] = useState("");
+
+  const handleSubmitComment = (e: FormEvent) => {
+    e.preventDefault();
+    if (newComment.trim()) {
+      const newCommentObj: Comment = {
+        id: Date.now(),
+        author: "You",
+        content: newComment,
+        votes: 0,
+        replies: []
+      };
+      setComments([...comments, newCommentObj]);
+      setNewComment("");
+    }
+  };
+
   const totalVotes = likes + dislikes;
-  const likePercentage = (likes / totalVotes) * 100;
-  const dislikePercentage = (dislikes / totalVotes) * 100;
+  const likePercentage = (likes / totalVotes) * 100 || 0;
+  const dislikePercentage = (dislikes / totalVotes) * 100 || 0;
 
   return (
     <div className="min-h-screen bg-background p-8 text-foreground">
@@ -139,3 +176,5 @@ function PublicOpinion({ likes, dislikes }) {
     </div>
   );
 }
+
+export default PublicOpinion;
