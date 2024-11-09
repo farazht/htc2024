@@ -21,8 +21,8 @@ const PagesData = [
     link: "/protected/profile",
   },
   {
-    name: "Representitives",
-    link: "/protected/representitives",
+    name: "Representatives",
+    link: "/protected/representatives",
   },
 ];
 
@@ -36,11 +36,7 @@ const NavbarLinksDesktop = () => {
           <div key={page.name} className="group relative">
             <Link href={page.link}>
               <div
-                className={`${
-                  page.link === pathname || pathname.includes(page.link + "/")
-                    ? "text-black"
-                    : ""
-                }  hover:text-black hover:scale-105 transition-all duration-300 p-2 lg:pr-2 md:pr-5 font-medium`}
+                className={`text-black hover:scale-105 transition-all duration-300 p-2 lg:pr-2 md:pr-5 font-medium`}
               >
                 {page.name}
               </div>
@@ -121,7 +117,7 @@ const NavbarLinksPhone = () => {
               <Link href={"/"}>
                 <div className="flex flex-col gap-3 items-center transition-colors duration-300">
                   <div className="flex flex-col justify-center items-center">
-                    <span className="text-4xl ">Billboard</span>
+                    <span className="text-4xl ">BillBoard</span>
                   </div>
                 </div>
               </Link>{" "}
@@ -138,12 +134,7 @@ const NavbarLinksPhone = () => {
                       >
                         <Link href={page.link}>
                           <div
-                            className={`${
-                              page.link === pathname ||
-                              pathname.includes(page.link + "/")
-                                ? "text-black"
-                                : ""
-                            }  hover:text-black text-start hover:scale-105 transition-all duration-300 p-5 pl-14 py-3 font-medium`}
+                            className={`text-black text-start hover:scale-105 transition-all duration-300 p-5 pl-14 py-3 font-medium`}
                           >
                             {page.name}
                           </div>
