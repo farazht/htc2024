@@ -16,8 +16,8 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "Billboard",
-  description: "Billboard, Local Policies",
+  title: "BillBoard",
+  description: "BillBoard brings local policies to you in a dedicated forum to explore, discuss, and analyze new policies in an open community. Stay informed, engage with others, and more - all for free, today.",
 };
 
 export default function RootLayout({
