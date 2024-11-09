@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import Image from 'next/image'
 import { usePathname } from "next/navigation";
 
 const PagesData = [
@@ -155,18 +156,20 @@ const NavbarLinksPhone = () => {
 export const Navbar = () => {
   return (
     <div className="bg-background w-full fixed border-b-2 border-foreground z-40">
-      <div className="p-5 px-10 m-auto max-w-7xl flex flex-row text-foreground justify-between">
-        <div className="lg:hidden md:hidden sm:flex flex"></div>
-        <Link href={"/"}>
-          <div className="flex flex-row gap-3 items-center flex-end">
-            <div className="flex flex-col justify-center items-center">
-              <span className="text-xl font-bold self-center">BillBoard</span>
-            </div>
-          </div>
-        </Link>{" "}
+      <div className="p-5 px-10 m-auto max-w-7xl flex items-center justify-between text-foreground">
+        <Link href="/" className="flex items-center space-x-2">
+          <Image
+            src="/logo.svg"
+            alt="BillBoard Logo"
+            width={32}
+            height={32}
+            className="w-8 h-8"
+          />
+          <span className="text-xl font-bold">BillBoard</span>
+        </Link>
         <NavbarLinksDesktop />
         <NavbarLinksPhone />
       </div>
     </div>
-  );
-};
+  )
+}
