@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { ThemeSwitcher } from './theme-switcher'
+import Logo from './Logo.png';
 
 export const Footer = () => {
   return (
@@ -8,10 +9,10 @@ export const Footer = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <Link href="/" className="flex items-center mb-4 sm:mb-0 space-x-3 rtl:space-x-reverse">
           <Image 
-            src="/placeholder.svg?height=32&width=32" 
+            src={Logo}
             width={32} 
             height={32} 
-            className="h-8" 
+            className="w-8 h-8" 
             alt="Logo" 
           />
           <span className="self-center text-2xl font-semibold whitespace-nowrap">

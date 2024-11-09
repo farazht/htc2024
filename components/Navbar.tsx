@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from 'next/image'
 import { usePathname } from "next/navigation";
+import Logo from './Logo.png';
 
 const PagesData = [
   {
@@ -158,12 +159,12 @@ export const Navbar = () => {
     <div className="bg-background w-full fixed border-b-2 border-foreground z-40">
       <div className="p-5 px-10 m-auto max-w-7xl flex items-center justify-between text-foreground">
         <Link href="/" className="flex items-center space-x-2">
-          <Image
-            src="/logo.svg"
-            alt="BillBoard Logo"
-            width={32}
-            height={32}
-            className="w-8 h-8"
+        <Image 
+            src={Logo}
+            width={32} 
+            height={32} 
+            className="w-8 h-8" 
+            alt="Logo" 
           />
           <span className="text-xl font-bold">BillBoard</span>
         </Link>
