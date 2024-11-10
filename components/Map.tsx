@@ -87,7 +87,7 @@ const Map: React.FC<{ selection: string }> = ({ selection }) => {
             key={key}
             data={geoData}
             style={{
-              color: "#eb4034",
+              color: "#200000",
               weight: 3,
               fillColor: "#eb4034",
               fillOpacity: 0.2,

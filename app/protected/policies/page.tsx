@@ -106,14 +106,19 @@ export default function Policies() {
                 height={200}
                 className="w-full h-48 object-cover"
               /> */}
-              <div className="p-4">
+              <div className="p-4 flex flex-col h-full">
                 <h2 className="text-xl font-semibold mb-2">{policy.title}</h2>
                 <p className="text-gray-600 mb-2">{policy.summary}</p>
-                <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">{policy.level_of_government}</span>
-                <div className="flex flex-wrap gap-2">
-                  {policy.tags.map((tag, index) => ( // Use tags instead of topics
-                    <span key={tag + index} className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">{tag}</span>
-                  ))}
+                
+                <div className="mt-auto">
+                  <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">{policy.level_of_government}</span>
+                  
+                  {/* Move the tags section below the level of government */}
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {policy.tags.map((tag, index) => ( // Use tags instead of topics
+                      <span key={tag + index} className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">{tag}</span>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
