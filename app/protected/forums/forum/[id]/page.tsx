@@ -46,7 +46,7 @@ export default function ForumPostView() {
         if (data) {
           // Use reduce to calculate upvotes and downvotes
           const { upvotes, downvotes } = data.ContentVotes?.reduce(
-            (acc, vote) => {
+            (acc: { upvotes: number; downvotes: number; }, vote: { vote: boolean; }) => {
               if (vote.vote === true) {
                 acc.upvotes += 1;
               } else if (vote.vote === false) {

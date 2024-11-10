@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
 import { useRouter } from "next/navigation";
+import router from "next/router";
+import Link from "next/link";
 
 // Petition Form Component
 function PetitionForm() {
@@ -43,6 +45,16 @@ function PetitionForm() {
       console.error("Error creating petition:", error);
       return;
     }
+
+    const element = document.getElementById(`notification`) as HTMLInputElement;
+
+    setTimeout(() => {
+      if (element) element.classList.add("opacity-0");
+    }, 2000);
+
+    setTimeout(() => {
+      if (element) element.classList.remove("opacity-0");
+    }, 100);
   };
 
   return (
@@ -51,6 +63,16 @@ function PetitionForm() {
         onSubmit={handleSubmit}
         className="container mx-auto px-4 py-8 flex flex-col gap-5"
       >
+        <div
+          id={`notification`}
+          className="opacity-0 transition-opacity fixed top-40 left-1/2 -translate-x-1/2 z-50"
+        >
+          <div
+            className={`bg-primary text-foreground text-sm p-4 rounded-md font-light`}
+          >
+            Successfully Submitted Petition!
+          </div>
+        </div>
         <div>
           <label htmlFor="title" className="block text-sm font-medium mb-1">
             Petition Title
@@ -125,6 +147,16 @@ function PollCreationForm() {
       return;
     }
 
+    const element = document.getElementById(`notification`) as HTMLInputElement;
+
+    setTimeout(() => {
+      if (element) element.classList.add("opacity-0");
+    }, 2000);
+
+    setTimeout(() => {
+      if (element) element.classList.remove("opacity-0");
+    }, 100);
+
     // Then, insert all poll choices
     const pollChoices = answers.map((answer) => ({
       content_id: pollData.id,
@@ -147,6 +179,16 @@ function PollCreationForm() {
         onSubmit={handleSubmit}
         className="container mx-auto px-4 py-8 flex flex-col gap-5"
       >
+        <div
+          id={`notification`}
+          className="opacity-0 transition-opacity fixed top-40 left-1/2 -translate-x-1/2 z-50"
+        >
+          <div
+            className={`bg-primary text-foreground text-sm p-4 rounded-md font-light`}
+          >
+            Successfully Submitted Poll!
+          </div>
+        </div>
         <div className="mb-6">
           <label
             htmlFor="question"
@@ -249,6 +291,16 @@ function ForumCreationForm() {
       console.error("Error creating forum:", error);
       return;
     }
+
+    const element = document.getElementById(`notification`) as HTMLInputElement;
+
+    setTimeout(() => {
+      if (element) element.classList.add("opacity-0");
+    }, 2000);
+
+    setTimeout(() => {
+      if (element) element.classList.remove("opacity-0");
+    }, 100);
   };
 
   return (
@@ -257,6 +309,16 @@ function ForumCreationForm() {
         onSubmit={handleSubmit}
         className="container mx-auto px-4 py-8 flex flex-col gap-5"
       >
+        <div
+          id={`notification`}
+          className="opacity-0 transition-opacity fixed top-40 left-1/2 -translate-x-1/2 z-50"
+        >
+          <div
+            className={`bg-primary text-foreground text-sm p-4 rounded-md font-light`}
+          >
+            Successfully Submitted Forum!
+          </div>
+        </div>
         <div>
           <label htmlFor="title" className="block text-sm font-medium mb-1">
             Forum Title

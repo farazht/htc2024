@@ -104,10 +104,21 @@ export default function PollVotingPage() {
   
         if (userEmailData) {
           // Update post state with user email as user_id
-          setPost((prevPost) => ({
-            ...prevPost,
-            user_id: userEmailData.user_email,
-          }));
+          setPost((prevPost) => {
+            if (!prevPost) return null;
+            return {
+              ...prevPost,
+              user_id: userEmailData.user_email,
+              id: prevPost.id,
+              title: prevPost.title,
+              description: prevPost.description,
+              content_type: prevPost.content_type,
+              created_at: prevPost.created_at,
+              upvotes: prevPost.upvotes,
+              downvotes: prevPost.downvotes,
+              options: prevPost.options,
+            };
+          });
         }
       }
     }
