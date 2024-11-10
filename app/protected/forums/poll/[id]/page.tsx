@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { ArrowBigUp, ArrowBigDown } from 'lucide-react';
 import CommentSection from '@/components/CommentSection'; // Only import CommentSection here
+import { createClient } from "../../../../../utils/supabase/client";
+
 
 // Initial Poll Data (for example)
 const initialPoll = {
@@ -21,28 +23,130 @@ const initialPoll = {
   commentCount: 12,
 };
 
+type Poll = {
+  id: number;
+  title: string;
+  options: { id: string; text: string; votes: number }[];
+  author: string;
+  timestamp: Date;
+  upvotes: number;
+  downvotes: number;
+}
+
 export default function PollVotingPage() {
-  const [poll, setPoll] = useState(initialPoll);
+  const [post, setPost] = useState<Poll | null>(null);
+  const supabase = createClient();
   const [userVote, setUserVote] = useState<'up' | 'down' | null>(null);
+  const [poll, setPoll] = useState(initialPoll);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [hasVoted, setHasVoted] = useState(false);
   const [showResults, setShowResults] = useState(false);
 
-  const handleVote = (voteType: 'up' | 'down') => {
-    setPoll((prevPoll) => {
-      const newPoll = { ...prevPoll };
-      if (userVote === voteType) {
-        newPoll[voteType === 'up' ? 'upvotes' : 'downvotes']--;
-        setUserVote(null);
-      } else {
-        newPoll[voteType === 'up' ? 'upvotes' : 'downvotes']++;
-        if (userVote) {
-          newPoll[userVote === 'up' ? 'upvotes' : 'downvotes']--;
+  const handleVote = async (voteType: 'up' | 'down') => {
+    if (!post) return;
+  
+    const voteValue = voteType === 'up';
+  
+    // Get the current user
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+  
+    if (!user) {
+      console.error("User not authenticated.");
+      return;
+    }
+  
+    // Check if the user has already voted on this content
+    const { data: existingVote, error: fetchError } = await supabase
+      .schema('Forum')
+      .from('ContentVotes')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('content_id', post.id)
+      .maybeSingle(); // Use maybeSingle() to avoid the error when no rows are returned
+  
+    if (fetchError) {
+      console.error("Error fetching existing vote:", fetchError);
+      return;
+    }
+  
+    if (existingVote) {
+      // User has already voted on this post
+      if (existingVote.vote === voteValue) {
+        // If the existing vote matches the new vote type, undo the vote
+        const { error: deleteError } = await supabase
+          .schema('Forum')
+          .from('ContentVotes')
+          .delete()
+          .eq('id', existingVote.id);
+  
+        if (deleteError) {
+          console.error("Error deleting vote:", deleteError);
+          return;
         }
-        setUserVote(voteType);
+  
+        // Update state to reflect vote removal
+        setPost((prevPost) => {
+          if (!prevPost) return null;
+          const updatedPost = { ...prevPost };
+          updatedPost[voteType === 'up' ? 'upvotes' : 'downvotes']--;
+          return updatedPost;
+        });
+  
+        setUserVote(null); // Reset user vote state
+  
+      } else {
+        // If the existing vote is opposite of the new vote type, update the vote
+        const { error: updateError } = await supabase
+          .schema('Forum')
+          .from('ContentVotes')
+          .update({ vote: voteValue })
+          .eq('id', existingVote.id);
+  
+        if (updateError) {
+          console.error("Error updating vote:", updateError);
+          return;
+        }
+  
+        // Update state to reflect the new vote type
+        setPost((prevPost) => {
+          if (!prevPost) return null;
+          const updatedPost = { ...prevPost };
+          updatedPost[voteType === 'up' ? 'upvotes' : 'downvotes']++;
+          updatedPost[userVote === 'up' ? 'upvotes' : 'downvotes']--;
+          return updatedPost;
+        });
+  
+        setUserVote(voteType); // Set user vote state to new type
       }
-      return newPoll;
-    });
+  
+    } else {
+      // No existing vote, insert a new vote
+      const { error: insertError } = await supabase
+        .schema('Forum')
+        .from('ContentVotes')
+        .insert({
+          content_id: post.id,
+          user_id: user.id,
+          vote: voteValue,
+        });
+  
+      if (insertError) {
+        console.error("Error inserting vote:", insertError);
+        return;
+      }
+  
+      // Update state to reflect new vote
+      setPost((prevPost) => {
+        if (!prevPost) return null;
+        const updatedPost = { ...prevPost };
+        updatedPost[voteType === 'up' ? 'upvotes' : 'downvotes']++;
+        return updatedPost;
+      });
+  
+      setUserVote(voteType); // Set user vote state to new type
+    }
   };
 
   const handleOptionSelect = (optionId: string) => {
@@ -51,18 +155,25 @@ export default function PollVotingPage() {
     }
   };
 
-  const handlePollVote = () => {
-    if (selectedOption && !hasVoted) {
-      setPoll((prevPoll) => {
-        const newPoll = { ...prevPoll };
-        const updatedOptions = newPoll.options.map((option) =>
-          option.id === selectedOption ? { ...option, votes: option.votes + 1 } : option
-        );
-        return { ...newPoll, options: updatedOptions };
-      });
-      setHasVoted(true);
-      setShowResults(true); // Automatically show results after voting
+  const handlePollVote = async () => {
+    if (!post) return;
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      console.error("User not authenticated.");
+      return;
     }
+
+    const { data: existingChoice, error: fetchError } = await supabase
+      .schema('Forum')
+      .from('PollVotes')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('poll_id', post.id)
+      .maybeSingle(); 
+
   };
 
   const formatDate = (timestamp: string) => {
