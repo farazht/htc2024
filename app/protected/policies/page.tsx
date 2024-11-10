@@ -1,9 +1,10 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { useRouter } from 'next/navigation'
+import { RetrievePolicy } from "../../../utils/supabaseCall"
 
 interface Policy {
   id: number
@@ -11,60 +12,33 @@ interface Policy {
   summary: string
   imageUrl: string
   level: string
-  topics: string[]
+  tags: string[] // Change from topics to tags
+  level_of_government: string[] // Change to an array to hold multiple levels
 }
 
-const policies: Policy[] = [
-    {
-      id: 1,
-      title: "Environmental Protection",
-      summary: "Initiatives to preserve natural resources and combat climate change.",
-      imageUrl: "/placeholder.svg?height=200&width=300",
-      level: "Federal",
-      topics: ["Environment", "Climate"]
-    },
-    {
-      id: 2,
-      title: "Education Reform",
-      summary: "Improving access to quality education for all citizens.",
-      imageUrl: "/placeholder.svg?height=200&width=300",
-      level: "State",
-      topics: ["Education", "Social"]
-    },
-    {
-      id: 3,
-      title: "Healthcare Access",
-      summary: "Ensuring affordable and accessible healthcare for everyone.",
-      imageUrl: "/placeholder.svg?height=200&width=300",
-      level: "Federal",
-      topics: ["Healthcare", "Social"]
-    },
-    {
-      id: 4,
-      title: "Economic Growth",
-      summary: "Stimulating job creation and sustainable economic development.",
-      imageUrl: "/placeholder.svg?height=200&width=300",
-      level: "Local",
-      topics: ["Economy", "Jobs"]
-    }
-  ]
-  
-  const allTopics = Array.from(new Set(policies.flatMap(policy => policy.topics)))
-  const allLevels = Array.from(new Set(policies.map(policy => policy.level)))
-  
-
-export default  function Policies() {
+export default function Policies() {
     const router = useRouter()
   
     const [searchTerm, setSearchTerm] = useState("")
     const [selectedTopic, setSelectedTopic] = useState<string | null>(null)
-    const [selectedLevel, setSelectedLevel] = useState<string | null>(null)
-  
+    const [selectedLevel, setSelectedLevel] = useState<string | null>(null) // New state for selected level
+    const [policies, setPolicies] = useState<Policy[]>([]);
+
     const filteredPolicies = policies.filter(policy => 
       (searchTerm === "" || policy.title.toLowerCase().includes(searchTerm.toLowerCase()) || policy.summary.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (selectedTopic === null || policy.topics.includes(selectedTopic)) &&
-      (selectedLevel === null || policy.level === selectedLevel)
-    )
+      (selectedTopic === null || policy.tags.includes(selectedTopic)) && // Use tags instead of topics
+      (selectedLevel === null || policy.level_of_government.includes(selectedLevel)) // Filter by level of government
+    );
+
+    useEffect(() => {
+        const fetchPolicies = async () => {
+            console.log('prior to call');
+            const retrievedPolicies = await RetrievePolicy(); // Call the async function
+            console.log('after call', retrievedPolicies); // This will log the retrieved policies
+            setPolicies(retrievedPolicies); // Update state with retrieved policies
+        };
+        fetchPolicies();
+    }, []); // Empty dependency array to run once on mount
   
     return (
       <div className="container mx-auto px-4 py-8">
@@ -79,6 +53,7 @@ export default  function Policies() {
             className="w-full"
           />
           
+          {/* Tags Filter */}
           <div className="flex flex-wrap gap-2">
             <Button
               onClick={() => setSelectedTopic(null)}
@@ -86,31 +61,32 @@ export default  function Policies() {
             >
               All Topics
             </Button>
-            {allTopics.map(topic => (
+            {Array.from(new Set(policies.flatMap(policy => policy.tags))).map((tag, index) => ( // Use tags for topics
               <Button
-                key={topic}
-                onClick={() => setSelectedTopic(topic)}
-                variant={selectedTopic === topic ? "default" : "outline"}
+                key={tag + index} // Ensure unique key
+                onClick={() => setSelectedTopic(tag)}
+                variant={selectedTopic === tag ? "default" : "outline"}
               >
-                {topic}
+                {tag}
               </Button>
             ))}
           </div>
-          
+
+          {/* Levels Filter */}
           <div className="flex flex-wrap gap-2">
             <Button
               onClick={() => setSelectedLevel(null)}
               variant={selectedLevel === null ? "default" : "outline"}
             >
-              All Levels
+              Levels of Government
             </Button>
-            {allLevels.map(level => (
+            {["Local", "Provincial", "Federal"].map((level, index) => (
               <Button
-                key={level}
+                key={level + index} // Ensure unique key
                 onClick={() => setSelectedLevel(level)}
                 variant={selectedLevel === level ? "default" : "outline"}
               >
-                {level}
+                {level.charAt(0).toUpperCase() + level.slice(1)} {/* Capitalize the first letter */}
               </Button>
             ))}
           </div>
@@ -123,20 +99,20 @@ export default  function Policies() {
               className="bg-background rounded-lg shadow-md overflow-hidden cursor-pointer"
               onClick={() => router.push(`/protected/policies/policy/${policy.id}`)}
             >
-              <Image
+              {/* <Image
                 src={policy.imageUrl}
                 alt={policy.title}
                 width={300}
                 height={200}
                 className="w-full h-48 object-cover"
-              />
+              /> */}
               <div className="p-4">
                 <h2 className="text-xl font-semibold mb-2">{policy.title}</h2>
                 <p className="text-gray-600 mb-2">{policy.summary}</p>
+                <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">{policy.level_of_government}</span>
                 <div className="flex flex-wrap gap-2">
-                  <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">{policy.level}</span>
-                  {policy.topics.map(topic => (
-                    <span key={topic} className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">{topic}</span>
+                  {policy.tags.map((tag, index) => ( // Use tags instead of topics
+                    <span key={tag + index} className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">{tag}</span>
                   ))}
                 </div>
               </div>
@@ -146,3 +122,4 @@ export default  function Policies() {
       </div>
     )
 }
+
