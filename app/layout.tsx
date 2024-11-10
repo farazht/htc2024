@@ -56,14 +56,12 @@ export default function RootLayout({
                       />
                       <span className="text-xl font-bold">BillBoard</span>
                     </Link>
-                    {!hasEnvVars ? <NavbarLinksDesktop /> : null}
-                    {!hasEnvVars ? <NavbarLinksPhone /> : null}
                     {!hasEnvVars ? <EnvVarWarning /> : <HeaderAuth />}
                   </div>
                 </div>
               </nav>
 
-              <div className="flex flex-col gap-20 max-w-5xl p-5 w-full">
+              <div className="flex flex-col gap-20 max-w-5xl p-5 w-full justify-center items-center min-h-screen">
                 {children}
               </div>
 
