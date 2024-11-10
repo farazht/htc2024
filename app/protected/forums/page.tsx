@@ -51,8 +51,8 @@ export default function ForumSection() {
           data?.map((post) => {
             // Sum the upvotes and downvotes from ContentVotes
             const rating = post.ContentVotes.reduce(
-              (sum: number, vote: { is_upvote: any }) => {
-                return sum + (vote.is_upvote ? 1 : -1);
+              (sum: number, vote: { vote: any }) => {
+                return sum + (vote.vote ? 1 : -1);
               },
               0
             );
