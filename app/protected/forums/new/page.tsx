@@ -5,6 +5,14 @@ import { useState } from "react";
 import Tiptap from "../../../../components/Tiptap";
 import { createClient } from "../../../../utils/supabase/client";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 // Petition Form Component
 function PetitionForm() {
@@ -38,7 +46,7 @@ function PetitionForm() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground px-4">
+    <div className="container mx-auto px-4 py-8 flex flex-col gap-5">
       <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
         <div>
           <label htmlFor="title" className="block text-sm font-medium mb-1">
@@ -256,7 +264,7 @@ function ForumCreationForm() {
           <Button
             type="submit"
             variant={"outline"}
-            className="mt-4 w-32 p-2 bg-primary text-background rounded"
+            className="mt-4 w-32 p-2 bg-primary text-foreground rounded"
           >
             Post
           </Button>
@@ -270,6 +278,10 @@ function ForumCreationForm() {
 export default function NewPostPage() {
   const searchParams = useSearchParams();
   const type = searchParams.get("type");
+  const router = useRouter();
+  const handleNewPost = (type: string) => {
+    router.push(`/protected/forums/new?type=${type}`);
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -278,6 +290,22 @@ export default function NewPostPage() {
           <h1 className="mb-8 text-3xl sm:text-4xl font-bold text-foreground">
             New Forum
           </h1>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="default" className="flex items-center">
+                Create Forum
+                <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onSelect={() => handleNewPost("petition")}>
+                Create Petition
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => handleNewPost("poll")}>
+                Create Poll
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <ForumCreationForm />
         </>
       )}
@@ -286,6 +314,22 @@ export default function NewPostPage() {
           <h1 className="mb-8 text-3xl sm:text-4xl font-bold text-foreground">
             New Poll
           </h1>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="default" className="flex items-center">
+                Create Poll
+                <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onSelect={() => handleNewPost("forum")}>
+                Create Forum
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => handleNewPost("petition")}>
+                Create Petition
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <PollCreationForm />
         </>
       )}
@@ -294,6 +338,22 @@ export default function NewPostPage() {
           <h1 className="mb-8 text-3xl sm:text-4xl font-bold text-foreground">
             New Petition
           </h1>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="default" className="flex items-center">
+                Create Petition
+                <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onSelect={() => handleNewPost("forum")}>
+                Create Forum
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => handleNewPost("poll")}>
+                Create Poll
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <PetitionForm />
         </>
       )}
