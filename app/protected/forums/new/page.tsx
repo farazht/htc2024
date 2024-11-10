@@ -29,7 +29,7 @@ function PetitionForm() {
       .insert({
         author_id: user?.id,
         description: description,
-        content_type: "Petition",
+        content_type: "petition",
         title: title,
       });
 
@@ -96,7 +96,7 @@ function PollCreationForm() {
         .insert({
           author_id: user?.id,
           description: "",
-          content_type: "Poll",
+          content_type: "poll",
           title: question,
         })
         .select()
@@ -196,7 +196,7 @@ function ForumCreationForm() {
         .insert({
           author_id: user?.id,
           description: content,
-          content_type: "Forum",
+          content_type: "forum",
           title: title,
         });
 
