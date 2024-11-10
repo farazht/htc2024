@@ -1,11 +1,12 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup, GeoJSON } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
 const Map: React.FC = () => {
   const [geoData, setGeoData] = useState(null);
+  const mapRef = useRef<L.Map | null>(null);
 
   const handleMarkerClick = ({ name }: { name: string }) => {
     if (name === "Calgary Center") {
@@ -32,11 +33,14 @@ const Map: React.FC = () => {
     },
   ];
 
-  // get geojson
+  // Get geojson
   useEffect(() => {
     fetch("/Wards.geojson")
       .then((response) => response.json())
-      .then((data) => setGeoData(data))
+      .then((data) => {
+        console.log("GeoJSON Data Loaded:", data); // Add a log for debugging
+        setGeoData(data);
+      })
       .catch((error) => console.error("Error loading GeoJSON:", error));
   }, []);
 
@@ -45,12 +49,12 @@ const Map: React.FC = () => {
     layer: L.Layer
   ) => {
     const { councillor, ward_num } = feature.properties;
-  
+
     if (councillor && ward_num) {
-      layer.on('mouseover', () => {
-        layer.bindPopup(
-          `<b>Ward ${ward_num}</b> — ${councillor}`
-        ).openPopup();
+      layer.on("mouseover", () => {
+        layer
+          .bindPopup(`<b>Ward ${ward_num}</b> — ${councillor}`)
+          .openPopup();
       });
     }
   };
@@ -60,19 +64,25 @@ const Map: React.FC = () => {
       <MapContainer
         center={[51.0447, -114.0719]}
         zoom={11}
-        style={{ height: "100vh", width: "100%" }}
+        style={{
+          height: "100vh",
+          width: "100%",
+          border: "1px solid red",  // Temporary for debugging
+        }}
         zoomControl={true}
         scrollWheelZoom={true}
         doubleClickZoom={true}
         dragging={true}
-        key="map"
+        whenReady={() => {
+          mapRef.current = mapRef.current as L.Map;
+        }}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://carto.com/attributions">CARTO</a>'
         />
 
-        {/* Render geojson after geoData is fetched */}
+        {/* Render GeoJSON after geoData is fetched */}
         {geoData && (
           <GeoJSON
             data={geoData}
