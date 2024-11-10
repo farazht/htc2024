@@ -28,7 +28,7 @@ const PagesData = [
   },
 ];
 
-const NavbarLinksDesktop = () => {
+export const NavbarLinksDesktop = () => {
   const pathname = usePathname();
 
   return (
@@ -50,7 +50,7 @@ const NavbarLinksDesktop = () => {
   );
 };
 
-const NavbarLinksPhone = () => {
+export const NavbarLinksPhone = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isSliding, setIsSliding] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
