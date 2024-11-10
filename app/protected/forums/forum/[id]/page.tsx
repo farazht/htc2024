@@ -38,7 +38,7 @@ export default function ForumPostView() {
             )
           `
           )
-          .eq("id", 1) // Use dynamic ID as needed
+          .eq("id", 34) // Use dynamic ID as needed
           .single(); // Fetch a single post
 
         if (error) {
