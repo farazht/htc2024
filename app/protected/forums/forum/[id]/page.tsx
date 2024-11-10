@@ -214,23 +214,21 @@ export default function ForumPostView() {
       <div className="max-w-3xl mx-auto">
         <div className="flex items-start space-x-4">
           <div className="flex flex-col items-center space-y-2">
-            <Button
-              variant={"default"}
+            <button
               onClick={() => handleVote("up")}
-              className={`p-1 rounded text-foreground ${userVote === "up" ? "bg-orange-500" : "bg-background"}`}
+              className={`p-1 rounded ${userVote === "up" ? "text-orange-500" : "text-gray-500 hover:text-gray-700"}`}
               aria-label="Upvote"
             >
               <ArrowBigUp className="w-6 h-6" />
-            </Button>
+            </button>
             <span className="font-bold">{post.upvotes - post.downvotes}</span>
-            <Button
-              variant={"default"}
+            <button
               onClick={() => handleVote("down")}
-              className={`text-foreground p-1 rounded ${userVote === "down" ? "bg-primary" : "bg-background"}`}
+              className={`p-1 rounded ${userVote === "down" ? "text-blue-500" : "text-gray-500 hover:text-gray-700"}`}
               aria-label="Downvote"
             >
               <ArrowBigDown className="w-6 h-6" />
-            </Button>
+            </button>
           </div>
           <div className="flex-1">
             <h1 className="text-2xl font-bold mb-2">{post.title}</h1>
