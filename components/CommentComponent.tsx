@@ -1,27 +1,20 @@
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { ThumbsUp, ThumbsDown } from 'lucide-react'
 
 type Comment = {
   id: number
   author: string
   content: string
   replies: Comment[]
-  likes: number
-  dislikes: number
 }
 
 function CommentComponent({ 
   comment, 
-  onReply, 
-  onLike, 
-  onDislike 
+  onReply 
 }: { 
   comment: Comment, 
-  onReply: (parentId: number, content: string) => void,
-  onLike: (id: number) => void,
-  onDislike: (id: number) => void
+  onReply: (parentId: number, content: string) => void
 }) {
   const [replyContent, setReplyContent] = useState('')
   const [showReplyInput, setShowReplyInput] = useState(false)
@@ -40,15 +33,7 @@ function CommentComponent({
         <div className="flex-1">
           <p className="font-semibold">{comment.author}</p>
           <p className="text-sm text-gray-600">{comment.content}</p>
-          <div className="flex items-center space-x-4 mt-2">
-            <Button variant="outline" size="sm" onClick={() => onLike(comment.id)} className="flex items-center">
-              <ThumbsUp className="w-4 h-4 mr-1" />
-              <span>{comment.likes}</span>
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => onDislike(comment.id)} className="flex items-center">
-              <ThumbsDown className="w-4 h-4 mr-1" />
-              <span>{comment.dislikes}</span>
-            </Button>
+          <div className="flex items-center justify-start -mx-3">
             <Button variant="link" size="sm" onClick={() => setShowReplyInput(!showReplyInput)}>
               Reply
             </Button>
@@ -73,8 +58,6 @@ function CommentComponent({
               key={reply.id} 
               comment={reply} 
               onReply={onReply} 
-              onLike={onLike} 
-              onDislike={onDislike} 
             />
           ))}
         </div>

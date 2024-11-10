@@ -239,7 +239,7 @@ export default function ForumPostView() {
         </div>
       </div>
       <div className="mt-8 space-y-4">
-        <CommentSection />
+        <CommentSection content_id={post.id} />
       </div>
 
     </div>
