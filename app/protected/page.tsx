@@ -35,7 +35,7 @@ export default async function Component() {
               className="fade-in"
             />
           </div>
-          <div className="flex flex-col flex-grow px-4 pb-4 pt-2">
+          <div className="flex flex-col flex-grow px-4 pb-4 pt-2 bg-background">
             <div className="flex-grow flex flex-col justify-start">
               <h2 className="mb-2 text-2xl font-semibold text-foreground">
                 Policies
@@ -65,7 +65,7 @@ export default async function Component() {
               className="fade-in"
             />
           </div>
-          <div className="flex flex-col flex-grow px-4 pb-4 pt-2">
+          <div className="flex flex-col flex-grow px-4 pb-4 pt-2 bg-background">
             <div className="flex-grow flex flex-col justify-start">
               <h2 className="mb-2 text-2xl font-semibold text-foreground">
                 Forums
@@ -95,7 +95,7 @@ export default async function Component() {
               className="fade-in"
             />
           </div>
-          <div className="flex flex-col flex-grow px-4 pb-4 pt-2">
+          <div className="flex flex-col flex-grow px-4 pb-4 pt-2 bg-background">
             <div className="flex-grow flex flex-col justify-start">
               <h2 className="mb-2 text-2xl font-semibold text-foreground">
                 Profile
@@ -124,7 +124,7 @@ export default async function Component() {
               className="fade-in"
             />
           </div>
-          <div className="flex flex-col flex-grow px-4 pb-4 pt-2">
+          <div className="flex flex-col flex-grow px-4 pb-4 pt-2 bg-background">
             <div className="flex-grow flex flex-col justify-start">
               <h2 className="mb-2 text-2xl font-semibold text-foreground">
                 Representatives
