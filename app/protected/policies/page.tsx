@@ -47,11 +47,11 @@ export default function Policies() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="mb-8 text-3xl sm:text-4xl font-bold text-foreground">
+      <h1 className="mb-6 text-3xl sm:text-4xl font-bold text-foreground">
         Our Policies
       </h1>
 
-      <div className="mb-8 space-y-10">
+      <div className="mb-8 space-y-4">
         <Input
           type="text"
           placeholder="Search policies..."
@@ -63,7 +63,7 @@ export default function Policies() {
         {/* Tags Filter */}
         <div className="flex flex-wrap gap-2 flex-col">
           <span>Filter by Topic</span>
-          <div className="flex flex-row gap-5 flex-wrap">
+          <div className="flex flex-row gap-3 flex-wrap">
             <Button
               onClick={() => setSelectedTopic(null)}
               variant={selectedTopic === null ? "default" : "outline"}
@@ -89,7 +89,7 @@ export default function Policies() {
         {/* Levels Filter */}
         <div className="flex flex-wrap gap-2 flex-col">
           <span>Filter by Levels of Government</span>
-          <div className="flex flex-row gap-5">
+          <div className="flex flex-row gap-3">
             <Button
               className="w-fit transition-transform duration-300 transform hover:scale-105 text-secondary-foreground border-2 border-solid border-muted"
               onClick={() => setSelectedLevel(null)}
