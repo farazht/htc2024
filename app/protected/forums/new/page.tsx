@@ -5,6 +5,14 @@ import { useState } from "react";
 import Tiptap from "../../../../components/Tiptap";
 import { createClient } from "../../../../utils/supabase/client";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 // Petition Form Component
 function PetitionForm() {
@@ -38,31 +46,39 @@ function PetitionForm() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground px-4">
-      <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
+    <>
+      <form
+        onSubmit={handleSubmit}
+        className="container mx-auto px-4 py-8 flex flex-col gap-5"
+      >
         <div>
           <label htmlFor="title" className="block text-sm font-medium mb-1">
-            Title
+            Petition Title
           </label>
           <input
+            placeholder="Enter Petition Title"
             type="text"
             id="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-md"
+            className="w-full p-2 border border-secondary rounded-md bg-background"
             required
           />
         </div>
-        <div className="p-4 border-2 bg-background max-w-4xl mx-auto rounded-lg shadow-md">
+        <div className="p-4 border bg-background md:w-full rounded-lg shadow-md border-secondary">
           <Tiptap onContentChange={handleEditorContentChange} />
         </div>
         <div className="flex justify-center">
-          <button className="mt-4 w-32 p-2 bg-blue-500 text-background rounded hover:bg-blue-600">
+          <Button
+            type="submit"
+            variant={"outline"}
+            className="mt-4 w-32 p-2 bg-primary text-foreground rounded"
+          >
             Post
-          </button>
+          </Button>
         </div>
       </form>
-    </div>
+    </>
   );
 }
 
@@ -126,14 +142,17 @@ function PollCreationForm() {
     }
   };
   return (
-    <div className="w-full max-w-lg mx-auto bg-white text-black rounded-lg">
-      <form onSubmit={handleSubmit}>
+    <>
+      <form
+        onSubmit={handleSubmit}
+        className="container mx-auto px-4 py-8 flex flex-col gap-5"
+      >
         <div className="mb-6">
           <label
             htmlFor="question"
-            className="block text-sm font-medium text-gray-700 mb-2"
+            className="block text-sm font-medium text-foreground mb-2"
           >
-            QUESTION
+            Question
           </label>
           <input
             id="question"
@@ -141,12 +160,12 @@ function PollCreationForm() {
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             placeholder="What question do you want to ask?"
-            className="w-full p-2 border border-gray-300 rounded-md"
+            className="w-full p-2 border border-gray-300 bg-background rounded-md"
           />
         </div>
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            ANSWERS
+          <label className="block text-sm font-medium text-foreground mb-2">
+            Choices
           </label>
           {answers.map((answer, index) => (
             <div key={index} className="flex mb-2">
@@ -155,8 +174,8 @@ function PollCreationForm() {
                   type="text"
                   value={answer}
                   onChange={(e) => updateAnswer(index, e.target.value)}
-                  placeholder="Type your answer"
-                  className="flex-1 p-2 outline-none"
+                  placeholder="Type a choice"
+                  className="flex-1 p-2 outline-none bg-background"
                 />
               </div>
               {answers.length > 2 && (
@@ -180,23 +199,25 @@ function PollCreationForm() {
               )}
             </div>
           ))}
-          <button
+          <Button
             onClick={addAnswer}
-            className="w-full p-2 mt-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+            variant={"outline"}
+            className="w-full p-2 mt-2 border border-gray-300 rounded-md bg-primary text-foreground"
           >
-            + Add another answer
-          </button>
+            + Add another choice
+          </Button>
         </div>
         <div className="flex justify-center">
-          <button
+          <Button
             type="submit"
-            className="w-32 p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            variant={"outline"}
+            className="mt-4 w-32 p-2 bg-primary text-foreground rounded"
           >
             Post
-          </button>
+          </Button>
         </div>
       </form>
-    </div>
+    </>
   );
 }
 
@@ -241,6 +262,7 @@ function ForumCreationForm() {
             Forum Title
           </label>
           <input
+            placeholder="Enter Forum Title"
             type="text"
             id="title"
             value={title}
@@ -256,7 +278,7 @@ function ForumCreationForm() {
           <Button
             type="submit"
             variant={"outline"}
-            className="mt-4 w-32 p-2 bg-primary text-background rounded"
+            className="mt-4 w-32 p-2 bg-primary text-foreground rounded"
           >
             Post
           </Button>
@@ -270,6 +292,10 @@ function ForumCreationForm() {
 export default function NewPostPage() {
   const searchParams = useSearchParams();
   const type = searchParams.get("type");
+  const router = useRouter();
+  const handleNewPost = (type: string) => {
+    router.push(`/protected/forums/new?type=${type}`);
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -278,6 +304,22 @@ export default function NewPostPage() {
           <h1 className="mb-8 text-3xl sm:text-4xl font-bold text-foreground">
             New Forum
           </h1>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="default" className="flex items-center">
+                Create Forum
+                <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onSelect={() => handleNewPost("petition")}>
+                Create Petition
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => handleNewPost("poll")}>
+                Create Poll
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <ForumCreationForm />
         </>
       )}
@@ -286,6 +328,22 @@ export default function NewPostPage() {
           <h1 className="mb-8 text-3xl sm:text-4xl font-bold text-foreground">
             New Poll
           </h1>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="default" className="flex items-center">
+                Create Poll
+                <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onSelect={() => handleNewPost("forum")}>
+                Create Forum
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => handleNewPost("petition")}>
+                Create Petition
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <PollCreationForm />
         </>
       )}
@@ -294,6 +352,22 @@ export default function NewPostPage() {
           <h1 className="mb-8 text-3xl sm:text-4xl font-bold text-foreground">
             New Petition
           </h1>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="default" className="flex items-center">
+                Create Petition
+                <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onSelect={() => handleNewPost("forum")}>
+                Create Forum
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => handleNewPost("poll")}>
+                Create Poll
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <PetitionForm />
         </>
       )}
