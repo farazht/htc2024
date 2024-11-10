@@ -36,8 +36,10 @@ export const Footer = () => {
         </div>
       </div>
       <hr className="my-6 border-border sm:mx-auto lg:my-8" />
+
+      {/* new Date() was causing some "Hydration failed" error */}
       <span className="block text-sm text-muted-foreground sm:text-center">
-        Brought to you by BillBoard, the policies of today — All Rights Reserved. © {new Date().getFullYear()}. 
+        Brought to you by BillBoard, the policies of today — All Rights Reserved. © 2024.
       </span>
     </footer>
   )
