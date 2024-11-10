@@ -160,7 +160,7 @@ function PollCreationForm() {
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             placeholder="What question do you want to ask?"
-            className="w-full p-2 border border-gray-300 bg-background rounded-md"
+            className="w-full p-2 border border-secondary bg-background rounded-md"
           />
         </div>
         <div className="mb-6">
@@ -169,7 +169,7 @@ function PollCreationForm() {
           </label>
           {answers.map((answer, index) => (
             <div key={index} className="flex mb-2">
-              <div className="flex-1 flex items-center border border-gray-300 rounded-md overflow-hidden">
+              <div className="flex-1 flex items-center border border-secondary rounded-md overflow-hidden">
                 <input
                   type="text"
                   value={answer}
@@ -202,7 +202,7 @@ function PollCreationForm() {
           <Button
             onClick={addAnswer}
             variant={"outline"}
-            className="w-full p-2 mt-2 border border-gray-300 rounded-md bg-primary text-foreground"
+            className="w-full p-2 mt-2 border border-secondary rounded-md bg-primary text-foreground"
           >
             + Add another choice
           </Button>
