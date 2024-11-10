@@ -71,7 +71,8 @@ export default function CommentSection() {
       id: Date.now(),
       author: 'Anonymous',
       content,
-      replies: []
+      replies: [],
+      content_id: ''
     }
 
     if (parentId === null) {

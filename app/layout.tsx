@@ -43,6 +43,9 @@ export default function RootLayout({
         <div className="absolute top-10 right-20 w-0 h-0 border-l-[40px] border-l-transparent border-r-[40px] border-r-transparent border-b-[70px] border-b-blue-500 opacity-5"></div>
         <div className="absolute bottom-10 right-1/3 w-0 h-0 border-l-[25px] border-l-transparent border-r-[25px] border-r-transparent border-b-[40px] border-b-green-500 opacity-5"></div>
 
+        <div className="absolute bottom-96 left-80 w-24 h-24 border-4 border-red-500 opacity-5"></div>
+        <div className="absolute bottom-2/4 right-32 w-32 h-32 border-4 border-green-500 opacity-5"></div>
+
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
