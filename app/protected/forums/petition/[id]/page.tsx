@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { ArrowBigUp, ArrowBigDown } from 'lucide-react';
 import { createClient } from "../../../../../utils/supabase/client";
+import CommentSection from '@/components/CommentSection';
 
 // Initialize Supabase client
 const supabase = createClient();
@@ -367,6 +368,9 @@ export default function PetitionView() {
                 </ul>
               </div>
             </div>
+            </div>
+            <div className="mt-8 space-y-4">
+              <CommentSection content_id={petition?.id} />
             </div>
           </div>
         </div>

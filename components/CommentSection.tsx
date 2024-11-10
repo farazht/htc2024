@@ -19,7 +19,7 @@ const supabase = createClient();
 
 async function fetchComments(contentID: number): Promise<Comment[]> {
   try {
-    const { data, error } = await supabase
+    const { data: commentsData, error } = await supabase
       .schema('Forum')
       .from('ForumComment')
       .select("*")
@@ -27,10 +27,31 @@ async function fetchComments(contentID: number): Promise<Comment[]> {
 
     if (error) throw error;
 
-    // Map data to match Comment type
-    const comments = data.map(item => ({
+    if (!commentsData) return [];
+
+    // Extract unique user_ids from comments
+    const userIds = Array.from(new Set(commentsData.map(comment => comment.user_id)));
+
+    // Fetch usernames from UserEmails table
+    const { data: usersData, error: usersError } = await supabase
+      .schema('Forum')
+      .from('UserEmails')
+      .select('user_id, user_email') // Adjust the column names as per your table
+      .in('user_id', userIds);
+
+    if (usersError) throw usersError;
+
+    // Create a mapping from user_id to username
+    const userIdToUsername = new Map<number, string>();
+    usersData?.forEach(user => {
+      userIdToUsername.set(user.user_id, user.user_email);
+    });
+
+    // Map commentsData to Comment type and assign usernames
+    const comments = commentsData.map(item => ({
       ...item,
       content: item.comment, // Map 'comment' to 'content'
+      author: userIdToUsername.get(item.user_id) || 'Anonymous',
       replies: [], // Initialize replies
     })) as Comment[];
 
@@ -49,7 +70,7 @@ function initializeChildren(commentsData: Comment[], initializedComments: Commen
   commentsData.forEach(comment => {
     if (comment.parent_id !== null) {
       const parent = findCommentByID(initializedComments, comment.parent_id);
-      if (parent) parent.replies.push({ ...comment, replies: [] });
+      if (parent) parent.replies.push(comment);
     }
   });
 }
@@ -81,6 +102,7 @@ export default function CommentSection({ content_id }: { content_id: number }) {
     const { data: { user } } = await supabase.auth.getUser();
 
     try {
+      // Insert into Supabase
       const { data, error } = await supabase
         .schema('Forum')
         .from('ForumComment')
@@ -95,10 +117,21 @@ export default function CommentSection({ content_id }: { content_id: number }) {
 
       if (error) throw error;
 
+      // Fetch the username for the user_id
+      const { data: userData, error: userError } = await supabase
+        .schema('Forum')
+        .from('UserEmails')
+        .select('user_email')
+        .eq('user_id', data[0].user_id)
+        .single();
+
+      if (userError) throw userError;
+
       // Map the inserted data to match the Comment type
       const addedComment = {
         ...data[0],
         content: data[0].comment, // Map 'comment' to 'content'
+        author: userData?.username || 'Anonymous',
         replies: [],
       } as Comment;
 
@@ -150,6 +183,7 @@ export default function CommentSection({ content_id }: { content_id: number }) {
             key={comment.id}
             comment={comment}
             onReply={addComment}
+            content_id={content_id}
           />
         ))}
       </div>

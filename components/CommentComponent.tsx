@@ -11,7 +11,7 @@ type Comment = {
 
 function CommentComponent({ 
   comment, 
-  onReply 
+  onReply,
 }: { 
   comment: Comment, 
   onReply: (parentId: number, content: string) => void
