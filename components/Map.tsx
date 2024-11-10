@@ -8,31 +8,7 @@ const Map: React.FC<{ selection: string }> = ({ selection }) => {
   const [geoData, setGeoData] = useState(null);
   const [key, setKey] = useState(0); // Add key for forcing GeoJSON re-render
   const mapRef = useRef<L.Map | null>(null);
-
-  const handleMarkerClick = ({ name }: { name: string }) => {
-    if (name === "Calgary Center") {
-      alert("Calgary Center");
-    }
-  };
-
-  // MP data
-  const mpData = [
-    {
-      name: "Calgary Center",
-      position: [51.05011, -114.08529] as [number, number],
-      district: "Calgary-Center",
-    },
-    {
-      name: "Calgary-North",
-      position: [51.0447, -114.0719] as [number, number],
-      district: "Calgary-North",
-    },
-    {
-      name: "Calgary-West",
-      position: [51.0285, -114.1307] as [number, number],
-      district: "Calgary-West",
-    },
-  ];
+  const [selectedWard, setSelectedWard] = useState<string | null>(null);
 
   // fetch GeoJSON based on the selection prop
   useEffect(() => {
@@ -50,7 +26,7 @@ const Map: React.FC<{ selection: string }> = ({ selection }) => {
       .then((data) => {
         console.log("GeoJSON Data Loaded:", data);
         setGeoData(data);
-        setKey(prev => prev + 1); // Force GeoJSON to re-render
+        setKey((prev) => prev + 1); // Force GeoJSON to re-render
       })
       .catch((error) => console.error("Error loading GeoJSON:", error));
   }, [selection]);
@@ -60,23 +36,26 @@ const Map: React.FC<{ selection: string }> = ({ selection }) => {
       const { councillor, ward_num } = feature.properties;
       if (councillor && ward_num) {
         layer.bindPopup(`<b>Ward ${ward_num}</b> — ${councillor}`);
+        layer.on("click", () => setSelectedWard(`Ward ${ward_num}`));
       }
     } else if (selection === "Constituency") {
       const { name, mla } = feature.properties;
       if (name && mla) {
         layer.bindPopup(`<b>${name}</b> — ${mla}`);
+        layer.on("click", () => setSelectedWard(name));
       }
     } else if (selection === "Electoral District") {
       const { name, mp } = feature.properties;
       if (name && mp) {
         layer.bindPopup(`<b>${name}</b> — ${mp}`);
+        layer.on("click", () => setSelectedWard(name));
       }
     }
 
     layer.on("mouseover", (e) => {
       layer.openPopup();
     });
-    
+
     layer.on("mouseout", (e) => {
       layer.closePopup();
     });
@@ -114,21 +93,12 @@ const Map: React.FC<{ selection: string }> = ({ selection }) => {
             onEachFeature={onEachFeature}
           />
         )}
-
-        {mpData.map((mp, index) => (
-          <Marker
-            key={index}
-            position={mp.position}
-            eventHandlers={{ click: () => handleMarkerClick({ name: mp.name }) }}
-          >
-            <Popup>
-              <strong>{mp.name}</strong>
-              <br />
-              {mp.district}
-            </Popup>
-          </Marker>
-        ))}
       </MapContainer>
+      <div>
+        {selectedWard
+          ? `Selected: ${selectedWard}`
+          : "Click a ward to see details"}
+      </div>
     </div>
   );
 };
