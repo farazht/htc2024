@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { createClient } from '../../../../../utils/supabase/client'
 import { RetrieveSinglePolicy, RetrieveComments, InsertComment, RetrievePolicyRatings, RetrieveUserId, InsertLikesDislikes, checkForLikeDislike  } from '@/utils/supabaseCall'
+import { FaExternalLinkAlt } from "react-icons/fa";
 
 export default function PolicyPage() {
   const { id } = useParams();
@@ -148,7 +149,12 @@ const handleDislike = async () => {
   return (
     <div className="min-h-screen bg-background p-8 text-foreground">
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-4xl font-bold mb-4">{policy?.title}</h1>
+        <div className="flex items-center mb-4">
+            <h1 className="text-4xl font-bold">{policy?.title}</h1>
+            <a href={policy?.link} target="_blank" rel="noopener noreferrer">
+                <FaExternalLinkAlt className="ml-2" />
+            </a>
+        </div>
         <div className="flex mb-2">
           <div className="flex items-center mr-4">
             <span className="font-semibold">Policy ID:</span>
