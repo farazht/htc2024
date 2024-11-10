@@ -6,11 +6,10 @@ import L from "leaflet";
 
 const Map: React.FC<{ selection: string }> = ({ selection }) => {
   const [geoData, setGeoData] = useState(null);
-  const [key, setKey] = useState(0); // Add key for forcing GeoJSON re-render
+  const [key, setKey] = useState(0);
   const mapRef = useRef<L.Map | null>(null);
   const [selectedWard, setSelectedWard] = useState<string | null>(null);
 
-  // fetch GeoJSON based on the selection prop
   useEffect(() => {
     let geojsonFile = "";
     if (selection === "Ward") {
@@ -26,7 +25,7 @@ const Map: React.FC<{ selection: string }> = ({ selection }) => {
       .then((data) => {
         console.log("GeoJSON Data Loaded:", data);
         setGeoData(data);
-        setKey((prev) => prev + 1); // Force GeoJSON to re-render
+        setKey((prev) => prev + 1);
       })
       .catch((error) => console.error("Error loading GeoJSON:", error));
   }, [selection]);
@@ -37,28 +36,31 @@ const Map: React.FC<{ selection: string }> = ({ selection }) => {
       if (councillor && ward_num) {
         layer.bindPopup(`<b>Ward ${ward_num}</b> — ${councillor}`);
         layer.on("click", () => setSelectedWard(`Ward ${ward_num}`));
-      }
-    } else if (selection === "Constituency") {
-      const { name, mla } = feature.properties;
-      if (name && mla) {
-        layer.bindPopup(`<b>${name}</b> — ${mla}`);
-        layer.on("click", () => setSelectedWard(name));
+        
+        layer.on("mouseover", (e) => {
+          layer.openPopup();
+        });
+
+        layer.on("mouseout", (e) => {
+          layer.closePopup();
+        });
       }
     } else if (selection === "Electoral District") {
       const { name, mp } = feature.properties;
       if (name && mp) {
         layer.bindPopup(`<b>${name}</b> — ${mp}`);
         layer.on("click", () => setSelectedWard(name));
+        
+        layer.on("mouseover", (e) => {
+          layer.openPopup();
+        });
+
+        layer.on("mouseout", (e) => {
+          layer.closePopup();
+        });
       }
     }
-
-    layer.on("mouseover", (e) => {
-      layer.openPopup();
-    });
-
-    layer.on("mouseout", (e) => {
-      layer.closePopup();
-    });
+    // No interactions for Constituency
   };
 
   return (
@@ -82,7 +84,7 @@ const Map: React.FC<{ selection: string }> = ({ selection }) => {
 
         {geoData && (
           <GeoJSON
-            key={key} // Add key to force re-render
+            key={key}
             data={geoData}
             style={{
               color: "#eb4034",
@@ -94,11 +96,6 @@ const Map: React.FC<{ selection: string }> = ({ selection }) => {
           />
         )}
       </MapContainer>
-      <div>
-        {selectedWard
-          ? `Selected: ${selectedWard}`
-          : "Click a ward to see details"}
-      </div>
     </div>
   );
 };
