@@ -33,7 +33,7 @@ export default async function Index() {
         <section className="text-center mb-16">
         <h2 className="text-3xl font-bold mb-6">Join BillBoard Today</h2>
         <p className="text-xl mb-8">Be part of the change. Sign up now to start engaging with your community and making your voice heard!</p>
-        <Link href="/signup">
+        <Link href="/sign-up">
           <Button size="lg" className="font-semibold">
             Sign Up
           </Button>
