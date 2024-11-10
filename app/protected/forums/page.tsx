@@ -79,9 +79,9 @@ export default function ForumSection() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem onSelect={() => handleNewPost('forum')}>New Forum</DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => handleNewPost('petition')}>New Petition</DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => handleNewPost('poll')}>New Poll</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => handleNewPost('forum')}>Forum</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => handleNewPost('petition')}>Petition</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => handleNewPost('poll')}>Poll</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
         
