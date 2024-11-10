@@ -24,7 +24,7 @@ export const Footer = () => {
         </Link>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mt-4 sm:mt-0">
           <ul className="flex flex-wrap items-center mb-4 sm:mb-0 text-sm font-medium">
-            {["Home", "Policies", "Forums", "Profile", "Represenatives"].map(
+            {["Home", "Policies", "Forums", "Profile", "Representatives"].map(
               (item, index) => (
                 <li key={item}>
                   <Link
