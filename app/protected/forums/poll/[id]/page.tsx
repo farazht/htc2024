@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowBigUp, ArrowBigDown } from 'lucide-react';
 import CommentSection from '@/components/CommentSection'; // Only import CommentSection here
 import { createClient } from "../../../../../utils/supabase/client";
+import { useParams } from 'next/navigation';
 
 
 // Initial Poll Data (for example)
@@ -34,6 +35,8 @@ type Poll = {
 }
 
 export default function PollVotingPage() {
+  const params = useParams();
+  const pollId = params.id;
   const [post, setPost] = useState<Poll | null>(null);
   const supabase = createClient();
   const [userVote, setUserVote] = useState<'up' | 'down' | null>(null);
@@ -41,6 +44,31 @@ export default function PollVotingPage() {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [hasVoted, setHasVoted] = useState(false);
   const [showResults, setShowResults] = useState(false);
+
+  useEffect(() => {
+    async function fetchPoll() {
+      const { data: pollData, error } = await supabase
+        .schema('Forum')
+        .from('Content')
+        .select('*')
+        .eq('id', pollId)
+        .single();
+
+      if (error) {
+        console.error("Error fetching poll:", error);
+        return;
+      }
+
+      if (pollData) {
+        setPost(pollData);
+        setPoll(pollData); // Update both state variables with the fetched data
+      }
+    }
+
+    if (pollId) {
+      fetchPoll();
+    }
+  }, [pollId, supabase]);
 
   const handleVote = async (voteType: 'up' | 'down') => {
     if (!post) return;
@@ -174,6 +202,75 @@ export default function PollVotingPage() {
       .eq('poll_id', post.id)
       .maybeSingle(); 
 
+    if (fetchError) {
+      console.error("Error fetching existing vote:", fetchError);
+      return;
+    }
+
+    if (existingChoice) {
+      if (existingChoice.choice === selectedOption) {
+        // If the existing vote matches the new vote type, undo the vote
+        const { error: deleteError } = await supabase
+          .schema('Forum')
+          .from('PollVotes')
+          .delete()
+          .eq('id', existingChoice.id);
+        if (deleteError) {
+          console.error("Error deleting vote:", deleteError);
+          return;
+        }
+        setPost((prevPost) => {
+          if (!prevPost) return null;
+          const updatedPost = { ...prevPost };
+          updatedPost.options.forEach((option) => {
+            if (option.id === selectedOption) option.votes--;
+          });
+          return updatedPost;
+        });
+        setSelectedOption(null);
+      } else {
+        // If the existing vote is opposite of the new vote type, update the vote
+        const { error: updateError } = await supabase
+          .schema('Forum')
+          .from('PollVotes')
+          .update({ choice: selectedOption })
+          .eq('id', existingChoice.id);
+        if (updateError) {
+          console.error("Error updating vote:", updateError);
+          return;
+        }
+        setPost((prevPost) => {
+          if (!prevPost) return null;
+          const updatedPost = { ...prevPost };
+          updatedPost.options.forEach((option) => {
+            if (option.id === selectedOption) option.votes++;
+          });
+          return updatedPost;
+        });
+        setSelectedOption(selectedOption);
+      }
+    } else {
+      // No existing vote, insert a new vote
+      const { error: insertError } = await supabase
+        .schema('Forum')
+        .from('PollVotes')
+        .insert({ poll_id: post.id, user_id: user.id, choice: selectedOption });
+
+      if (insertError) {
+        console.error("Error inserting vote:", insertError);
+        return;
+      }
+      setPost((prevPost) => {
+        if (!prevPost) return null;
+        const updatedPost = { ...prevPost };
+        updatedPost.options.forEach((option) => {
+          if (option.id === selectedOption) option.votes++;
+        });
+        return updatedPost;
+      });
+
+      setSelectedOption(selectedOption);
+    }
   };
 
   const formatDate = (timestamp: string) => {
@@ -189,7 +286,7 @@ export default function PollVotingPage() {
     });
   };
 
-  const totalVotes = poll.options.reduce((sum, option) => sum + option.votes, 0);
+  const totalVotes = poll?.options?.reduce((sum, option) => sum + option.votes, 0);
 
   return (
     <div className="min-h-screen bg-background text-foreground p-4">
@@ -218,7 +315,7 @@ export default function PollVotingPage() {
               Posted by {poll.author} on {formatDate(poll.timestamp)}
             </div>
             <div className="space-y-4">
-              {poll.options.map((option) => (
+              {poll?.options?.map((option) => (
                 <div key={option.id} className="flex items-center space-x-2">
                   <input
                     type="radio"
@@ -262,7 +359,7 @@ export default function PollVotingPage() {
         
         {/* Render CommentSection as the only comment component */}
         <div className="mt-8 space-y-4">
-          <CommentSection />
+          <CommentSection content_id={Number(pollId)} />
         </div>
       </div>
     </div>

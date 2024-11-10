@@ -11,7 +11,7 @@ type Comment = {
 
 function CommentComponent({ 
   comment, 
-  onReply 
+  onReply,
 }: { 
   comment: Comment, 
   onReply: (parentId: number, content: string) => void
@@ -31,6 +31,8 @@ function CommentComponent({
     <div className="mb-4">
       <div className="flex items-start space-x-4">
         <div className="flex-1">
+        <div className="separator" />
+
           <p className="font-semibold">{comment.author}</p>
           <p className="text-sm text-gray-600">{comment.content}</p>
           <div className="flex items-center justify-start -mx-3">
@@ -51,14 +53,20 @@ function CommentComponent({
           )}
         </div>
       </div>
+      
       {comment.replies.length > 0 && (
         <div className="ml-8 mt-2">
-          {comment.replies.map((reply) => (
-            <CommentComponent 
-              key={reply.id} 
-              comment={reply} 
-              onReply={onReply} 
-            />
+          
+          {comment.replies.map((reply, index) => (
+            <div key={reply.id}>
+              {/* <div className="separator" /> */}
+
+              <CommentComponent 
+                comment={reply} 
+                onReply={onReply} 
+              />
+              {index < comment.replies.length - 1}
+            </div>
           ))}
         </div>
       )}

@@ -110,77 +110,10 @@
   animation: slideUp 0.5s ease-out forwards;
 }
 
-.hashtag-shape {
-  position: relative;
-  width: 2rem; /* Adjust size as needed */
-  height: 2rem;
-}
-
-.hashtag-shape::before,
-.hashtag-shape::after {
-  content: "";
-  position: absolute;
-  background-color: #4b5563; /* Adjust color as needed */
-  opacity: 0.3;
-}
-
-/* Vertical bars */
-.hashtag-shape::before {
-  width: 0.3rem;
-  height: 100%;
-  left: 25%; /* Adjust position to look like a hashtag */
-}
-
-.hashtag-shape::after {
-  width: 0.3rem;
-  height: 100%;
-  left: 75%;
-}
-
-/* Horizontal bars */
-.hashtag-shape .horizontal-bar-1,
-.hashtag-shape .horizontal-bar-2 {
-  position: absolute;
-  width: 100%;
-  height: 0.3rem;
-  background-color: #4b5563;
-  opacity: 0.3;
-}
-
-.hashtag-shape .horizontal-bar-1 {
-  top: 25%;
-}
-
-.hashtag-shape .horizontal-bar-2 {
-  top: 75%;
-}
-
-.tilde-shape {
-  position: relative;
-  width: 3rem;
-  height: 1rem;
-  background-color: transparent; 
-}
-
-.tilde-shape::before,
-.tilde-shape::after {
-  content: "";
-  position: absolute;
-  width: 50%;
-  height: 0.3rem;
-  background-color: #6b7280;
-  opacity: 0.3;
-  border-radius: 50%; 
-}
-
-.tilde-shape::before {
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%) rotate(-15deg);
-}
-
-.tilde-shape::after {
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%) rotate(15deg);
+/* Add this to your CSS file */
+.separator {
+  height: 1px; /* Height of the separator */
+  background-color: #D1D5DB; /* Light gray color */
+  margin: 8px 0; /* Vertical margin for spacing */
+  width: 100%; /* Full width */
 }
