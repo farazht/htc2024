@@ -102,7 +102,7 @@ export default function ForumSection() {
   );
 
   return (
-    <div className="max-w-4xl mx-auto py-4 px-12 w-full flex flex-col justify-start min-h-screen text-secondary gap-5">
+    <div className="container mx-auto px-4 py-8">
       <h1 className="mb-8 text-3xl sm:text-4xl font-bold text-foreground">
         User Forums
       </h1>
@@ -114,7 +114,10 @@ export default function ForumSection() {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="flex-grow"
         />
-        <Button variant="outline" className="shrink-0 text-secondary">
+        <Button
+          variant="outline"
+          className="shrink-0 text-secondary border-2 border-solid border-muted"
+        >
           <Search className="mr-2 h-4 w-4" />
           Search
         </Button>
@@ -131,20 +134,23 @@ export default function ForumSection() {
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem onSelect={() => handleNewPost("forum")}>
-              Forum
+              Create Forum
             </DropdownMenuItem>
             <DropdownMenuItem onSelect={() => handleNewPost("petition")}>
-              Petition
+              Create Petition
             </DropdownMenuItem>
             <DropdownMenuItem onSelect={() => handleNewPost("poll")}>
-              Poll
+              Create Poll
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="text-secondary">
+            <Button
+              variant="outline"
+              className="text-secondary border-2 border-solid border-muted"
+            >
               Sort by: {sortOption.replace("-", " ")}
               <ChevronDown className="ml-2 h-4 w-4 text-secondary" />
             </Button>

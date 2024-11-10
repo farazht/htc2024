@@ -46,7 +46,7 @@ export default function Policies() {
   }, []);
 
   return (
-    <div className="container mx-auto px-4 py-8 fade-in">
+    <div className="container mx-auto px-4 py-8">
       <h1 className="mb-8 text-3xl sm:text-4xl font-bold text-foreground">
         Our Policies
       </h1>
@@ -67,7 +67,7 @@ export default function Policies() {
             <Button
               onClick={() => setSelectedTopic(null)}
               variant={selectedTopic === null ? "default" : "outline"}
-              className="transition-transform duration-300 transform hover:scale-105 text-secondary-foreground"
+              className="transition-transform duration-300 transform hover:scale-105 text-secondary-foreground border-2 border-solid border-muted"
             >
               All Topics
             </Button>
@@ -77,7 +77,7 @@ export default function Policies() {
                   key={tag + index}
                   onClick={() => setSelectedTopic(tag)}
                   variant={selectedTopic === tag ? "default" : "outline"}
-                  className="transition-transform duration-300 transform hover:scale-105 text-secondary-foreground"
+                  className="transition-transform duration-300 transform hover:scale-105 text-secondary-foreground border-2 border-solid border-muted"
                 >
                   {tag}
                 </Button>
@@ -91,7 +91,7 @@ export default function Policies() {
           <span>Filter by Levels of Government</span>
           <div className="flex flex-row gap-5">
             <Button
-              className="w-fit transition-transform duration-300 transform hover:scale-105 text-secondary-foreground"
+              className="w-fit transition-transform duration-300 transform hover:scale-105 text-secondary-foreground border-2 border-solid border-muted"
               onClick={() => setSelectedLevel(null)}
               variant={selectedLevel === null ? "default" : "outline"}
             >
@@ -99,7 +99,7 @@ export default function Policies() {
             </Button>
             {["Local", "Provincial", "Federal"].map((level, index) => (
               <Button
-                className="w-fit transition-transform duration-300 transform hover:scale-105 text-secondary-foreground"
+                className="w-fit transition-transform duration-300 transform hover:scale-105 text-secondary-foreground border-2 border-solid border-muted"
                 key={level + index}
                 onClick={() => setSelectedLevel(level)}
                 variant={selectedLevel === level ? "default" : "outline"}

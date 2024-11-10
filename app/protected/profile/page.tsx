@@ -54,9 +54,9 @@ const profile = async () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-8">
+    <div className="container mx-auto px-4 py-8">
       {user && (
-        <h1 className="mb-8 text-4xl font-bold text-foreground">
+        <h1 className="mb-2 text-4xl font-bold text-foreground">
           Hello {user.email}!
         </h1>
       )}
@@ -68,11 +68,11 @@ const profile = async () => {
             {data.comments.map((comment, index) => (
               <div
                 key={index}
-                className="bg-background p-4 border-2 rounded-xl shadow-sm"
+                className="bg-background p-4 border-2 rounded-xl shadow-sm fade-in slide-up duration-300 ease-in-out transition-transform flex justify-between flex-col"
               >
                 <h3 className="font-semibold">{comment.postTitle}</h3>
-                <p className="text-sm text-foreground">{comment.date}</p>
-                <p className="mt-2">{comment.content}</p>
+                <p className="text-sm text-secondary">{comment.date}</p>
+                <p className="mt-2 font-light">{comment.content}</p>
               </div>
             ))}
           </div>
@@ -83,10 +83,10 @@ const profile = async () => {
             {data.likedPosts.map((post, index) => (
               <div
                 key={index}
-                className="mb-4 p-4 bg-background border-2 rounded-xl shadow-sm"
+                className="mb-4 p-4 bg-background border-2 rounded-xl shadow-sm fade-in slide-up duration-300 ease-in-out transition-transform"
               >
                 <h3 className="font-semibold text-lg">{post.title}</h3>
-                <p className="text-sm text-foreground">
+                <p className="text-sm text-secondary">
                   By {post.author} on {post.date}
                 </p>
               </div>
@@ -100,10 +100,10 @@ const profile = async () => {
             {data.votedItems.map((item, index) => (
               <div
                 key={index}
-                className="mb-4 p-4 bg-background border-2 rounded-xl shadow-sm"
+                className="mb-4 p-4 bg-background border-2 rounded-xl shadow-sm fade-in slide-up duration-300 ease-in-out transition-transform"
               >
                 <h3 className="font-semibold text-lg">{item.title}</h3>
-                <p className="text-sm text-foreground">
+                <p className="text-sm text-secondary">
                   {item.type} - {item.date}
                 </p>
                 <p className="mt-2">Vote: {item.vote}</p>

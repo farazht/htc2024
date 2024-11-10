@@ -18,13 +18,16 @@ const Representatives: React.FC = () => {
   };
 
   return (
-    <div className="min-w-full">
-      {/* text */}
-      <h1 className="text-3xl font-bold text-center my-8">Representatives Map</h1>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="mb-8 text-3xl sm:text-4xl font-bold text-foreground">
+        Representatives Map
+      </h1>
 
       {/* dropdown */}
       <div className="flex items-center space-x-4 mb-4">
-        <label htmlFor="geoSelect" className="font-medium">Select Level:</label>
+        <label htmlFor="geoSelect" className="font-medium">
+          Select Level:
+        </label>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="px-4 py-2 bg-background dark:bg-background-dark rounded-md text-sm border border-foreground dark:border-foreground-dark hover:bg-background-light dark:hover:bg-background-dark-light">
@@ -32,14 +35,23 @@ const Representatives: React.FC = () => {
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
-            <DropdownMenuRadioGroup value={selection} onValueChange={handleSelectionChange}>
+            <DropdownMenuRadioGroup
+              value={selection}
+              onValueChange={handleSelectionChange}
+            >
               <DropdownMenuRadioItem value="Ward" className="text-foreground">
                 Ward (Municipal)
               </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="Constituency" className="text-foreground">
+              <DropdownMenuRadioItem
+                value="Constituency"
+                className="text-foreground"
+              >
                 Constituency (Provincial)
               </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="Electoral District" className="text-foreground">
+              <DropdownMenuRadioItem
+                value="Electoral District"
+                className="text-foreground"
+              >
                 Electoral District (Federal)
               </DropdownMenuRadioItem>
             </DropdownMenuRadioGroup>
