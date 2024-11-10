@@ -16,7 +16,7 @@ export default async function Component() {
 
   return (
     <div className="min-h-screen bg-background p-4 sm:p-8">
-      <h1 className="mb-8 text-3xl sm:text-4xl font-bold text-foreground">BillBoard</h1>
+      <h1 className="mb-8 text-3xl sm:text-4xl font-bold text-foreground">Welcome!</h1>
       <div className="grid grid-cols-1 gap-4 sm:gap-8 md:grid-cols-3 md:grid-rows-2">
         {/* Policies Section */}
         <div className="md:col-span-2 flex flex-col border-2 rounded-xl shadow-sm p-4">

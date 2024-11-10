@@ -35,7 +35,7 @@ export const Footer = () => {
           <ThemeSwitcher />
         </div>
       </div>
-      <hr className="my-6 border-border sm:mx-auto lg:my-8" />
+      <hr className="my-4 border-border sm:mx-auto" />
 
       {/* new Date() was causing some "Hydration failed" error */}
       <span className="block text-sm text-muted-foreground sm:text-center">
