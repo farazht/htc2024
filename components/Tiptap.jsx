@@ -158,13 +158,19 @@ const extensions = [
 
 const content = ``
 
-export default function TiptapEditor() {
-  return (
-    <EditorProvider
-      slotBefore={<MenuBar />}
-      extensions={extensions}
-      content={content}
-      className="fixed-height-editor"
-    ></EditorProvider>
-  )
+export default function TiptapEditor({ onContentChange }) {
+    return (
+      <EditorProvider
+        slotBefore={<MenuBar />}
+        extensions={extensions}
+        content={content}
+        className="fixed-height-editor"
+        onUpdate={({ editor }) => {
+          const htmlContent = editor.getHTML();
+          if (onContentChange) {
+            onContentChange(htmlContent);
+          }
+        }}
+      ></EditorProvider>
+    );
 }
