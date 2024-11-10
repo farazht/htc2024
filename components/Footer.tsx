@@ -24,11 +24,14 @@ export const Footer = () => {
         </Link>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mt-4 sm:mt-0">
           <ul className="flex flex-wrap items-center mb-4 sm:mb-0 text-sm font-medium">
+            <span className="pr-10">
+              <ThemeSwitcher />
+            </span>
             {["Home", "Policies", "Forums", "Profile", "Representatives"].map(
               (item, index) => (
                 <li key={item}>
                   <Link
-                    href={`/${item.toLowerCase()}`}
+                    href={`/protected/${item == "Home" ? "" : item.toLowerCase()}`}
                     className={`hover:underline ${index !== 4 ? "me-4 md:me-6" : ""}`}
                   >
                     {item}
@@ -37,7 +40,6 @@ export const Footer = () => {
               )
             )}
           </ul>
-          <ThemeSwitcher />
         </div>
       </div>
       <hr className="my-4 border-border sm:mx-auto" />

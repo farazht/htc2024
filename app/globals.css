@@ -113,7 +113,7 @@
 /* Add this to your CSS file */
 .separator {
   height: 1px; /* Height of the separator */
-  background-color: #D1D5DB; /* Light gray color */
+  background-color: #d1d5db; /* Light gray color */
   margin: 8px 0; /* Vertical margin for spacing */
   width: 100%; /* Full width */
 }
