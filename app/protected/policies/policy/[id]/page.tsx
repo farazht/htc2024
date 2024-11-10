@@ -172,14 +172,14 @@ const handleDislike = async () => {
           <div className="flex justify-between mb-2">
             <button 
               onClick={handleLike} 
-              className={`mr-2 ${hasLiked ? 'bg-blue-600 text-white' : 'bg-gray-200 text-black'}`} 
+              className={`mr-2 px-4 py-1 rounded-full ${hasLiked ? 'bg-blue-600 text-white' : 'bg-black text-white'}`} 
               disabled={hasLiked}
             >
               Like {likes}
             </button>
             <button 
               onClick={handleDislike} 
-              className={`${hasDisliked ? 'bg-red-600 text-white' : 'bg-gray-200 text-black'}`} 
+              className={`px-4 py-1 rounded-full ${hasDisliked ? 'bg-red-600 text-white' : 'bg-black text-white'}`} 
               disabled={hasDisliked}
             >
               Dislike {dislikes}
