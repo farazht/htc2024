@@ -54,7 +54,11 @@ export default async function AuthButton() {
       {user ? <NavbarLinksDesktop /> : null}
       {user ? <NavbarLinksPhone /> : null}
       <form action={signOutAction}>
-        <Button type="submit" variant={"outline"}>
+        <Button
+          type="submit"
+          variant={"outline"}
+          className="ml-5 text-foreground border-2 border-solid border-muted"
+        >
           Sign out
         </Button>
       </form>

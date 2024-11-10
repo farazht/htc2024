@@ -9,6 +9,7 @@ import {
   DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
 import Map from "@/components/Map";
+import { Button } from "@/components/ui/button";
 
 const Representatives: React.FC = () => {
   const [selection, setSelection] = useState("Ward"); // Default to "Ward"
@@ -30,9 +31,12 @@ const Representatives: React.FC = () => {
         </label>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="px-4 py-2 bg-background dark:bg-background-dark rounded-md text-sm border border-foreground dark:border-foreground-dark hover:bg-background-light dark:hover:bg-background-dark-light">
+            <Button
+              variant={"outline"}
+              className="px-4 py-2 bg-background rounded-md text-sm text-foreground border-2 border-solid border-muted"
+            >
               {selection} <span className="ml-2">▼</span>
-            </button>
+            </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
             <DropdownMenuRadioGroup

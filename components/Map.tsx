@@ -67,7 +67,7 @@ const Map: React.FC<{ selection: string }> = ({ selection }) => {
     <div style={{ position: "relative", zIndex: 0 }}>
       <MapContainer
         center={[51.0447, -114.0719]}
-        zoom={11}
+        zoom={10.5}
         style={{ height: "100vh", width: "100%" }}
         zoomControl={true}
         scrollWheelZoom={true}

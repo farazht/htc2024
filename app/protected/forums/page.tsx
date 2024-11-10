@@ -192,12 +192,12 @@ export default function ForumSection() {
                   {/* Rating Label */}
                   <div className="flex items-center mt-2">
                     {post.rating >= 0 ? (
-                      <ThumbsUp className="mr-1 h-4 w-4 text-green-200" />
+                      <ThumbsUp className="mr-1 h-4 w-4 text-green-400" />
                     ) : (
-                      <ThumbsDown className="mr-1 h-4 w-4 text-red-200" />
+                      <ThumbsDown className="mr-1 h-4 w-4 text-red-400" />
                     )}
                     <span
-                      className={`text-sm font-semibold ${post.rating >= 0 ? "text-green-200" : "text-red-200"}`}
+                      className={`text-sm font-semibold ${post.rating >= 0 ? "text-green-400" : "text-red-400"}`}
                     >
                       {post.rating}
                     </span>
