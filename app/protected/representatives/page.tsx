@@ -1,7 +1,13 @@
 import React from "react";
+import Map from "@/components/Map";
 
-const representitives = () => {
-  return <div>representitives</div>;
+const Representatives: React.FC = () => {
+  return (
+    <div>
+      <h1>Calgary Representatives Map</h1>
+      <Map />
+    </div>
+  );
 };
 
-export default representitives;
+export default Representatives;
