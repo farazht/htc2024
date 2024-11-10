@@ -40,6 +40,21 @@ const Map: React.FC = () => {
       .catch((error) => console.error("Error loading GeoJSON:", error));
   }, []);
 
+  const onEachFeature = (
+    feature: { properties: { councillor: string; ward_num: string } },
+    layer: L.Layer
+  ) => {
+    const { councillor, ward_num } = feature.properties;
+  
+    if (councillor && ward_num) {
+      layer.on('mouseover', () => {
+        layer.bindPopup(
+          `<b>Ward ${ward_num}</b> — ${councillor}`
+        ).openPopup();
+      });
+    }
+  };
+
   return (
     <div style={{ position: "relative", zIndex: 0 }}>
       <MapContainer
@@ -57,7 +72,7 @@ const Map: React.FC = () => {
           attribution='&copy; <a href="https://carto.com/attributions">CARTO</a>'
         />
 
-        {/* render geojson component after geodata is fetched */}
+        {/* Render geojson after geoData is fetched */}
         {geoData && (
           <GeoJSON
             data={geoData}
@@ -67,6 +82,7 @@ const Map: React.FC = () => {
               fillColor: "#eb4034",
               fillOpacity: 0.2,
             }}
+            onEachFeature={onEachFeature}
           />
         )}
 
