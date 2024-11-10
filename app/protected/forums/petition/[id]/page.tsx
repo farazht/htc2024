@@ -53,7 +53,7 @@ export default function PetitionView() {
             )
           `
           )
-          .eq("id", 1) // Fetch petition with a known ID (or replace 1 with a dynamic value as needed)
+          .eq("id", 39) // Fetch petition with a known ID (or replace 1 with a dynamic value as needed)
           .single();
 
         if (error) {
