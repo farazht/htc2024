@@ -68,7 +68,7 @@ export default function PetitionView() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-black p-4">
+    <div className="min-h-screen bg-background text-foreground p-4">
       <div className="max-w-3xl mx-auto">
         <div className="flex items-start space-x-4">
           <div className="flex flex-col items-center space-y-2">
