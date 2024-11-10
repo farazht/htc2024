@@ -56,8 +56,8 @@ export default function RootLayout({
                       />
                       <span className="text-xl font-bold">BillBoard</span>
                     </Link>
-                    <NavbarLinksDesktop />
-                    <NavbarLinksPhone />
+                    {!hasEnvVars ? <NavbarLinksDesktop /> : null}
+                    {!hasEnvVars ? <NavbarLinksPhone /> : null}
                     {!hasEnvVars ? <EnvVarWarning /> : <HeaderAuth />}
                   </div>
                 </div>
