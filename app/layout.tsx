@@ -1,17 +1,10 @@
-import DeployButton from "@/components/deploy-button";
 import { EnvVarWarning } from "@/components/env-var-warning";
 import HeaderAuth from "@/components/header-auth";
-import { ThemeSwitcher } from "@/components/theme-switcher";
 import { hasEnvVars } from "@/utils/supabase/check-env-vars";
 import { GeistSans } from "geist/font/sans";
 import { ThemeProvider } from "next-themes";
 import Link from "next/link";
 import "./globals.css";
-import {
-  Navbar,
-  NavbarLinksDesktop,
-  NavbarLinksPhone,
-} from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import Image from "next/image";
 import Logo from "../components/Logo.png";
