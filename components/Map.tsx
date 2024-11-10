@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState, useRef } from "react";
-import { MapContainer, TileLayer, Marker, Popup, GeoJSON } from "react-leaflet";
+import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
@@ -8,7 +8,6 @@ const Map: React.FC<{ selection: string }> = ({ selection }) => {
   const [geoData, setGeoData] = useState(null);
   const [key, setKey] = useState(0);
   const mapRef = useRef<L.Map | null>(null);
-  const [selectedWard, setSelectedWard] = useState<string | null>(null);
 
   useEffect(() => {
     let geojsonFile = "";
@@ -25,7 +24,7 @@ const Map: React.FC<{ selection: string }> = ({ selection }) => {
       .then((data) => {
         console.log("GeoJSON Data Loaded:", data);
         setGeoData(data);
-        setKey((prev) => prev + 1);
+        setKey((prev) => prev + 1); // Update key to force GeoJSON re-render
       })
       .catch((error) => console.error("Error loading GeoJSON:", error));
   }, [selection]);
@@ -35,32 +34,18 @@ const Map: React.FC<{ selection: string }> = ({ selection }) => {
       const { councillor, ward_num } = feature.properties;
       if (councillor && ward_num) {
         layer.bindPopup(`<b>Ward ${ward_num}</b> — ${councillor}`);
-        layer.on("click", () => setSelectedWard(`Ward ${ward_num}`));
-        
-        layer.on("mouseover", (e) => {
-          layer.openPopup();
-        });
-
-        layer.on("mouseout", (e) => {
-          layer.closePopup();
-        });
+        layer.on("mouseover", () => layer.openPopup());
+        layer.on("mouseout", () => layer.closePopup());
       }
     } else if (selection === "Electoral District") {
-      const { name, mp } = feature.properties;
-      if (name && mp) {
-        layer.bindPopup(`<b>${name}</b> — ${mp}`);
-        layer.on("click", () => setSelectedWard(name));
-        
-        layer.on("mouseover", (e) => {
-          layer.openPopup();
-        });
-
-        layer.on("mouseout", (e) => {
-          layer.closePopup();
-        });
+      const { councillor, label } = feature.properties;
+      if (councillor && label) {
+        layer.bindPopup(`<b>${label}</b> — ${councillor}`);
+        layer.on("mouseover", () => layer.openPopup());
+        layer.on("mouseout", () => layer.closePopup());
       }
     }
-    // No interactions for Constituency
+    // if we add constituency later, add interactions here
   };
 
   return (
