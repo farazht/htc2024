@@ -6,6 +6,7 @@ import L from "leaflet";
 
 const Map: React.FC<{ selection: string }> = ({ selection }) => {
   const [geoData, setGeoData] = useState(null);
+  const [key, setKey] = useState(0); // Add key for forcing GeoJSON re-render
   const mapRef = useRef<L.Map | null>(null);
 
   const handleMarkerClick = ({ name }: { name: string }) => {
@@ -49,23 +50,36 @@ const Map: React.FC<{ selection: string }> = ({ selection }) => {
       .then((data) => {
         console.log("GeoJSON Data Loaded:", data);
         setGeoData(data);
+        setKey(prev => prev + 1); // Force GeoJSON to re-render
       })
       .catch((error) => console.error("Error loading GeoJSON:", error));
-  }, [selection]); // re-fetch when the selection changes
+  }, [selection]);
 
-  const onEachFeature = (
-    feature: { properties: { councillor: string; ward_num: string } },
-    layer: L.Layer
-  ) => {
-    const { councillor, ward_num } = feature.properties;
-
-    if (councillor && ward_num) {
-      layer.on("mouseover", () => {
-        layer
-          .bindPopup(`<b>Ward ${ward_num}</b> — ${councillor}`)
-          .openPopup();
-      });
+  const onEachFeature = (feature: any, layer: L.Layer) => {
+    if (selection === "Ward") {
+      const { councillor, ward_num } = feature.properties;
+      if (councillor && ward_num) {
+        layer.bindPopup(`<b>Ward ${ward_num}</b> — ${councillor}`);
+      }
+    } else if (selection === "Constituency") {
+      const { name, mla } = feature.properties;
+      if (name && mla) {
+        layer.bindPopup(`<b>${name}</b> — ${mla}`);
+      }
+    } else if (selection === "Electoral District") {
+      const { name, mp } = feature.properties;
+      if (name && mp) {
+        layer.bindPopup(`<b>${name}</b> — ${mp}`);
+      }
     }
+
+    layer.on("mouseover", (e) => {
+      layer.openPopup();
+    });
+    
+    layer.on("mouseout", (e) => {
+      layer.closePopup();
+    });
   };
 
   return (
@@ -73,10 +87,7 @@ const Map: React.FC<{ selection: string }> = ({ selection }) => {
       <MapContainer
         center={[51.0447, -114.0719]}
         zoom={11}
-        style={{
-          height: "100vh",
-          width: "100%",
-        }}
+        style={{ height: "100vh", width: "100%" }}
         zoomControl={true}
         scrollWheelZoom={true}
         doubleClickZoom={true}
@@ -90,9 +101,9 @@ const Map: React.FC<{ selection: string }> = ({ selection }) => {
           attribution='&copy; <a href="https://carto.com/attributions">CARTO</a>'
         />
 
-        {/* Render GeoJSON after geoData is fetched */}
         {geoData && (
           <GeoJSON
+            key={key} // Add key to force re-render
             data={geoData}
             style={{
               color: "#eb4034",
@@ -104,7 +115,6 @@ const Map: React.FC<{ selection: string }> = ({ selection }) => {
           />
         )}
 
-        {/* Markers */}
         {mpData.map((mp, index) => (
           <Marker
             key={index}
