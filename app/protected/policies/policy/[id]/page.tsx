@@ -1,128 +1,171 @@
-"use client";
+"use client"
 
-import { useState, FormEvent } from "react";
-import { ChevronDown, ChevronUp, ThumbsDown, ThumbsUp } from "lucide-react";
+import { useEffect, useState } from 'react'
+import { useParams } from 'next/navigation'
+import { createClient } from '../../../../../utils/supabase/client'
+import { RetrieveSinglePolicy, RetrieveComments, InsertComment, RetrievePolicyRatings, RetrieveUserId, InsertLikesDislikes, checkForLikeDislike  } from '@/utils/supabaseCall'
 
-// Define the types for a Comment
-interface Comment {
-  id: number;
-  author: string;
-  content: string;
-  votes: number;
-  replies: Comment[];
-}
-
-// Props for the CommentThread component
-interface CommentThreadProps {
-  comment: Comment;
-  depth?: number;
-}
-
-// CommentThread Component
-function CommentThread({ comment, depth = 0 }: CommentThreadProps) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [votes, setVotes] = useState(comment.votes);
-
-  const handleVote = (value: number) => {
-    setVotes(votes + value);
-  };
-
-  return (
-    <div className={`mt-4 ${depth > 0 ? "ml-8 border-l-2 border-gray-200 pl-4" : ""}`}>
-      <div className="flex items-start space-x-2">
-        <div className="flex flex-col items-center space-y-1">
-          <button onClick={() => handleVote(1)} className="text-gray-400 hover:text-blue-500">
-            <ThumbsUp size={16} />
-          </button>
-          <span className={`text-sm font-medium ${votes > 0 ? "text-blue-500" : votes < 0 ? "text-red-500" : "text-gray-500"}`}>
-            {votes}
-          </span>
-          <button onClick={() => handleVote(-1)} className="text-gray-400 hover:text-red-500">
-            <ThumbsDown size={16} />
-          </button>
-        </div>
-        <div className="flex-grow">
-          <div className="flex items-center space-x-2">
-            <span className="font-medium">{comment.author}</span>
-            <button onClick={() => setIsCollapsed(!isCollapsed)} className="text-gray-400 hover:text-gray-600">
-              {isCollapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
-            </button>
-          </div>
-          {!isCollapsed && (
-            <>
-              <p className="mt-1 text-sm">{comment.content}</p>
-              {comment.replies?.map((reply) => (
-                <CommentThread key={reply.id} comment={reply} depth={depth + 1} />
-              ))}
-            </>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Props for the PublicOpinion component
-interface PublicOpinionProps {
-  likes: number;
-  dislikes: number;
-}
-
-// PublicOpinion Component
-function PublicOpinion({ likes, dislikes }: PublicOpinionProps) {
+export default function PolicyPage() {
+  const { id } = useParams();
+  const [policy, setPolicy] = useState<Policy | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
-  const [newComment, setNewComment] = useState("");
+  const [newComment, setNewComment] = useState<string>('');
+  const [likes, setLikes] = useState<number>(0);
+  const [dislikes, setDislikes] = useState<number>(0);
 
-  const handleSubmitComment = (e: FormEvent) => {
-    e.preventDefault();
-    if (newComment.trim()) {
-      const newCommentObj: Comment = {
-        id: Date.now(),
-        author: "You",
-        content: newComment,
-        votes: 0,
-        replies: []
-      };
-      setComments([...comments, newCommentObj]);
-      setNewComment("");
+
+  interface Policy {
+    id: number
+    title: string
+    summary: string
+    overview: string
+    link: string
+    status: string
+    introduced_on: string
+    imageUrl: string
+    level: string
+    tags: string[]
+    level_of_government: string[]
+  }
+
+  interface Comment {
+    id: number
+    author: string
+    content: string
+    replies: Reply[]
+  }
+
+  interface Reply {
+    id: number
+    author: string
+    content: string
+  }
+  useEffect(() => {
+    const fetchPolicyData = async () => {
+        if (id) {
+            const retrievedPolicies = await RetrieveSinglePolicy(Number(id));
+            setPolicy(retrievedPolicies[0] || null);
+
+            // const retrievedComments = await RetrieveComments(Number(id));
+            // setComments(retrievedComments);
+
+            try {
+              const { likes, dislikes } = await RetrievePolicyRatings(Number(id));
+              setLikes(likes);
+              setDislikes(dislikes);
+                            console.log(likes, dislikes)
+
+          } catch (error) {
+              console.error('Error retrieving policy ratings:', error);
+              // Set likes and dislikes to zero if an error occurs
+              setLikes(0);
+              setDislikes(0);
+              console.log(likes, dislikes)
+          }
+        }
+    };
+    fetchPolicyData();
+}, [id]);
+
+// Calculate percentage for the bar display
+const totalVotes = likes + dislikes;
+const likePercentage = totalVotes > 0 ? (likes / totalVotes) * 100 : 0;
+const dislikePercentage = totalVotes > 0 ? (dislikes / totalVotes) * 100 : 0;
+
+
+// const handleSubmitComment = async (e: { preventDefault: () => void }) => {
+//   e.preventDefault();
+//   if (newComment.trim()) {
+//       const commentData = {
+//           content: newComment,
+//           policy_id: Number(id),
+//           author: 'CurrentUser', // Replace with actual user
+//       };
+//       const { data, error } = await InsertComment(commentData);
+//       if (!error && data && data[0]) {
+//           setComments([...comments, { ...data[0], replies: [] }]);
+//           setNewComment('');
+//       }
+//   }
+// };
+
+
+const handleLike = async () => {
+  const userId = await RetrieveUserId(); // Retrieve the user ID
+  if (userId) {
+    console.log(userId);
+    
+    // Check for existing like/dislike and delete if it exists
+    const existingVote = await checkForLikeDislike(userId, Number(id));
+    
+    // Now insert the new like
+    const result = await InsertLikesDislikes(userId, 1, Number(id)); // Pass userId, feedback, and policyId
+
+    // Check if result is not null before accessing error
+    if (result && !result.error) {
+      setLikes(likes + 1);
+      if (existingVote) {
+        // If there was an existing vote, adjust likes/dislikes accordingly
+        setDislikes(dislikes - 1); // Decrease dislikes if they were previously disliked
+      }
+    } else {
+      console.error('Error inserting like/dislike:', result?.error);
     }
-  };
+  } else {
+    console.error('User not authenticated');
+  }
+};
 
-  const totalVotes = likes + dislikes;
-  const likePercentage = (likes / totalVotes) * 100 || 0;
-  const dislikePercentage = (dislikes / totalVotes) * 100 || 0;
+const handleDislike = async () => {
+  const userId = await RetrieveUserId(); // Retrieve the user ID
+  if (userId) {
+    const existingVote = await checkForLikeDislike(userId, Number(id));
+    
+    // Now insert the new dislike
+    const result = await InsertLikesDislikes(userId, -1, Number(id)); // Pass userId, feedback, and policyId
+
+    // Check if result is not null before accessing error
+    if (result && !result.error) {
+      setDislikes(dislikes + 1);
+      if (existingVote) {
+        // If there was an existing vote, adjust likes/dislikes accordingly
+        setLikes(likes - 1); // Decrease likes if they were previously liked
+      }
+    } else {
+      console.error('Error inserting like/dislike:', result?.error);
+    }
+  } else {
+    console.error('User not authenticated');
+  }
+};
 
   return (
-    <div className="min-h-screen bg-background p-8 text-foreground">
+    <div className="min-h-screen bg-white p-8 text-black">
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-4xl font-bold mb-4">Clean Energy Initiative</h1>
-        <div className="mb-4">
-          <span className="font-semibold">Policy ID:</span> POL-2023-001
-        </div>
-        <div className="mb-4">
-          <span className="font-semibold">Status:</span> <span className="text-green-600">Active</span>
+        <h1 className="text-4xl font-bold mb-4">{policy?.title}</h1>
+        <div className="flex mb-2">
+          <div className="flex items-center mr-4">
+            <span className="font-semibold">Policy ID:</span>
+            <span className="ml-2">{policy?.id}</span>
+          </div>
+          <div className="flex items-center">
+            <span className="font-semibold">Status:</span>
+            <span className="text-green-600 ml-2">{policy?.status}</span>
+          </div>
         </div>
         <div className="mb-6">
           <h2 className="text-2xl font-semibold mb-2">Summary</h2>
-          <p>A comprehensive plan to transition to 100% renewable energy sources by 2050.</p>
+          <p>{policy?.summary}</p>
         </div>
         <div className="mb-8">
           <h2 className="text-2xl font-semibold mb-2">Overview</h2>
-          <p>The Clean Energy Initiative is a bold and ambitious plan to revolutionize our energy sector and combat climate change. This policy aims to achieve a complete transition to renewable energy sources such as solar, wind, and hydroelectric power by the year 2050. Key components of the initiative include:</p>
-          <ul className="list-disc pl-5 mt-2">
-            <li>Significant investments in renewable energy infrastructure</li>
-            <li>Gradual phase-out of fossil fuel-based energy production</li>
-            <li>Incentives for businesses and households to adopt clean energy solutions</li>
-            <li>Research and development funding for new clean energy technologies</li>
-            <li>Job training programs for workers transitioning from traditional energy sectors</li>
-          </ul>
-          <p className="mt-2">This policy is designed to not only address environmental concerns but also to stimulate economic growth through the creation of new jobs in the renewable energy sector.</p>
+          <p>{policy?.overview}</p>
         </div>
         <div className="mb-8">
           <h2 className="text-2xl font-semibold mb-2">Public Opinion</h2>
           <div className="flex justify-between mb-2">
-            <span className="mr-2">Supports {likes}</span>
-            <span>Against {dislikes}</span>
+            <button onClick={handleLike} className="mr-2">Like {likes}</button>
+            <button onClick={handleDislike}>Dislike {dislikes}</button>
           </div>
           <div className="h-6 bg-gray-200 rounded-full overflow-hidden">
             <div
@@ -150,7 +193,7 @@ function PublicOpinion({ likes, dislikes }: PublicOpinionProps) {
         <div>
           <h2 className="text-2xl font-semibold mb-4">Comments</h2>
           <div className="mb-4">
-            <form onSubmit={handleSubmitComment}>
+            {/* <form onSubmit={handleSubmitComment}>
               <textarea
                 className="w-full p-2 border border-gray-300 rounded"
                 rows={3}
@@ -160,21 +203,30 @@ function PublicOpinion({ likes, dislikes }: PublicOpinionProps) {
               ></textarea>
               <button
                 type="submit"
-                className="mt-2 px-4 py-2 bg-blue-500 text-background rounded hover:bg-blue-600"
+                className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
               >
                 Submit Comment
               </button>
-            </form>
+            </form> */}
           </div>
           <div className="space-y-4">
             {comments.map((comment) => (
-              <CommentThread key={comment.id} comment={comment} />
+              <div key={comment.id} className="border-b border-gray-200 pb-4">
+                <div className="font-semibold">{comment.author}</div>
+                <p>{comment.content}</p>
+                <div className="ml-8 mt-2 space-y-2">
+                  {comment.replies.map((reply) => (
+                    <div key={reply.id}>
+                      <div className="font-semibold">{reply.author}</div>
+                      <p>{reply.content}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         </div>
       </div>
     </div>
-  );
+  )
 }
-
-export default PublicOpinion;
