@@ -81,7 +81,7 @@ export default function PollVotingPage() {
   const totalVotes = poll.options.reduce((sum, option) => sum + option.votes, 0);
 
   return (
-    <div className="min-h-screen bg-white text-black p-4">
+    <div className="min-h-screen bg-background text-foreground p-4">
       <div className="max-w-3xl mx-auto">
         <div className="flex items-start space-x-4">
           <div className="flex flex-col items-center space-y-2">
@@ -134,14 +134,14 @@ export default function PollVotingPage() {
               <button
                 onClick={handlePollVote}
                 disabled={!selectedOption || hasVoted}
-                className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-blue-500 text-background rounded disabled:bg-gray-300 disabled:cursor-not-allowed"
               >
                 {hasVoted ? 'Voted' : 'Cast Vote'}
               </button>
               <button
                 onClick={() => setShowResults(true)}
                 disabled={showResults}
-                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                className="px-4 py-2 bg-gray-500 text-background rounded hover:bg-gray-600"
               >
                 Show Results
               </button>

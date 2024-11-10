@@ -34,11 +34,11 @@ function PetitionForm() {
             required
           />
         </div>
-        <div className="p-4 border-2 bg-white max-w-4xl mx-auto rounded-lg shadow-md">
+        <div className="p-4 border-2 bg-background max-w-4xl mx-auto rounded-lg shadow-md">
             <Tiptap onContentChange={handleEditorContentChange} />
         </div>
         <div className='flex justify-center'>
-            <button className="mt-4 w-32 p-2 bg-blue-500 text-white rounded hover:bg-blue-600">Post</button>
+            <button className="mt-4 w-32 p-2 bg-blue-500 text-background rounded hover:bg-blue-600">Post</button>
         </div>
       </form>
     </div>
@@ -63,7 +63,7 @@ function PollCreationForm() {
   };
 
   return (
-    <div className="w-full max-w-lg mx-auto bg-white text-black rounded-lg">
+    <div className="w-full max-w-lg mx-auto bg-background text-foreground rounded-lg">
       <div className="mb-6">
         <label htmlFor="question" className="block text-sm font-medium text-gray-700 mb-2">QUESTION</label>
         <input
@@ -102,7 +102,7 @@ function PollCreationForm() {
         </button>
       </div>
       <div className='flex justify-center'>
-        <button className="w-32 p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+        <button className="w-32 p-2 bg-blue-600 text-background rounded-md hover:bg-blue-700">
             Post
         </button>
       </div>
@@ -157,11 +157,11 @@ function ForumCreationForm() {
             required
           />
         </div>
-        <div className="p-4 border-2 bg-white max-w-4xl mx-auto rounded-lg shadow-md">
+        <div className="p-4 border-2 bg-background max-w-4xl mx-auto rounded-lg shadow-md">
           <Tiptap onContentChange={handleEditorContentChange} />
         </div>
         <div className='flex justify-center'>
-          <button type="submit" className="mt-4 w-32 p-2 bg-blue-500 text-white rounded hover:bg-blue-600">Post</button>
+          <button type="submit" className="mt-4 w-32 p-2 bg-blue-500 text-background rounded hover:bg-blue-600">Post</button>
         </div>
       </form>
     </>
@@ -174,7 +174,7 @@ export default function NewPostPage() {
   const type = searchParams.get('type');
 
   return (
-    <div className='min-h-screen bg-white py-8'>
+    <div className='min-h-screen bg-background py-8'>
       {type === 'forum' && (
         <>
           <h1 className='text-3xl text-center font-bold py-10'>New Forum</h1>
