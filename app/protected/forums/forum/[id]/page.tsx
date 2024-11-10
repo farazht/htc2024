@@ -1,56 +1,112 @@
 "use client";
 
-import { useState } from 'react';
-import { ArrowBigUp, ArrowBigDown, MessageSquare, Share2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ArrowBigUp, ArrowBigDown } from 'lucide-react';
+import { createClient } from "../../../../../utils/supabase/client";
 
-// This would typically come from your API or database
-const initialPost = {
-  id: '1',
-  title: 'Example Forum Post Title',
-  content: '<p>This is an example forum post content. It can contain <strong>HTML</strong> formatting.</p><p>Multiple paragraphs are supported.</p>',
-  author: 'JohnDoe',
-  timestamp: '2023-06-15T10:30:00Z',
-  upvotes: 15,
-  downvotes: 3,
-  commentCount: 7,
+type ForumPost = {
+  id: number;
+  title: string;
+  description: string;
+  author: string;
+  rating: number;
+  timestamp: Date;
+  content_type: string;
+  upvotes: number;
+  downvotes: number;
 };
 
 export default function ForumPostView() {
-  const [post, setPost] = useState(initialPost);
+  const [post, setPost] = useState<ForumPost | null>(null);
   const [userVote, setUserVote] = useState<'up' | 'down' | null>(null);
 
-  const handleVote = (voteType: 'up' | 'down') => {
-    setPost(prevPost => {
-      const newPost = { ...prevPost };
-      if (userVote === voteType) {
-        // Undo the vote
-        newPost[voteType === 'up' ? 'upvotes' : 'downvotes']--;
-        setUserVote(null);
-      } else {
-        // Apply new vote
-        newPost[voteType === 'up' ? 'upvotes' : 'downvotes']++;
-        if (userVote) {
-          // Remove the opposite vote if it exists
-          newPost[userVote === 'up' ? 'upvotes' : 'downvotes']--;
+  const supabase = createClient();
+
+  useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        const { data, error } = await supabase
+          .schema('Forum')
+          .from('Content') 
+          .select(`
+            *,
+            ContentVotes (
+              vote
+            )
+          `)
+          .eq('id', 1) // Use dynamic ID as needed
+          .single(); // Fetch a single post
+
+        if (error) {
+          console.error("Error fetching post:", error);
+          return;
         }
-        setUserVote(voteType);
+
+        if (data) {
+          // Calculate upvotes and downvotes from ContentVotes
+          const upvotes = data.ContentVotes?.filter((vote: any) => vote.vote === true).length || 0;
+          const downvotes = data.ContentVotes?.filter((vote: any) => vote.vote === false).length || 0;
+
+          // Format post data
+          const formattedPost: ForumPost = {
+            id: data.id,
+            title: data.title,
+            description: data.description,
+            author: data.author || "Anonymous", // Fallback if author is missing
+            rating: upvotes - downvotes,
+            timestamp: new Date(data.created_at),
+            content_type: data.content_type,
+            upvotes,
+            downvotes,
+          };
+
+          setPost(formattedPost);
+        }
+      } catch (err) {
+        console.error("Unexpected error:", err);
       }
-      return newPost;
-    });
+    };
+
+    fetchPost();
+  }, []);
+
+  const handleVote = (voteType: 'up' | 'down') => {
+    if (post) {
+      setPost((prevPost) => {
+        if (!prevPost) return null;
+        const newPost = { ...prevPost };
+        
+        if (userVote === voteType) {
+          // Undo the vote
+          newPost[voteType === 'up' ? 'upvotes' : 'downvotes']--;
+          setUserVote(null);
+        } else {
+          // Apply new vote
+          newPost[voteType === 'up' ? 'upvotes' : 'downvotes']++;
+          if (userVote) {
+            newPost[userVote === 'up' ? 'upvotes' : 'downvotes']--;
+          }
+          setUserVote(voteType);
+        }
+
+        return newPost;
+      });
+    }
   };
 
-  const formatDate = (timestamp: string) => {
-    const date = new Date(timestamp);
-    return date.toLocaleDateString('en-US', {
+  const formatDate = (timestamp: Date) => {
+    return timestamp.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
-    }) + ' at ' + date.toLocaleTimeString('en-US', {
+    }) + ' at ' + timestamp.toLocaleTimeString('en-US', {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true,
     });
   };
+
+  if (!post) return <div>Loading...</div>;
 
   return (
     <div className="min-h-screen bg-background text-foreground p-4">
@@ -78,9 +134,9 @@ export default function ForumPostView() {
             <div className="text-sm text-gray-500 mb-4">
               Posted by {post.author} on {formatDate(post.timestamp)}
             </div>
-            <div 
+            <div
               className="prose max-w-none"
-              dangerouslySetInnerHTML={{ __html: post.content }}
+              dangerouslySetInnerHTML={{ __html: post.description }}
             />
           </div>
         </div>
