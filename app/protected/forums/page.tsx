@@ -105,7 +105,7 @@ export default function ForumSection() {
 
       <div className="space-y-4">
         {filteredAndSortedPosts.map((post) => (
-          <div key={post.id} className="bg-white text-black border-2 rounded-md shadow-sm my-2 p-4">
+          <div key={post.id} className="bg-background text-foreground border-2 rounded-md shadow-sm my-2 p-4">
             <div>
               <div>{post.title}</div>
             </div>

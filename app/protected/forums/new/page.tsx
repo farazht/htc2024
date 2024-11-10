@@ -15,7 +15,7 @@ function PetitionForm() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-black px-4">
+    <div className="min-h-screen bg-background text-foreground px-4">
       <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
         <div>
           <label htmlFor="title" className="block text-sm font-medium mb-1">Title</label>

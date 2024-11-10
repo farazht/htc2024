@@ -4,7 +4,7 @@ import { MapContainer, TileLayer, Marker, Popup, GeoJSON } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
-const Map: React.FC = () => {
+const Map: React.FC<{ selection: string }> = ({ selection }) => {
   const [geoData, setGeoData] = useState(null);
   const mapRef = useRef<L.Map | null>(null);
 
@@ -33,16 +33,25 @@ const Map: React.FC = () => {
     },
   ];
 
-  // Get geojson
+  // fetch GeoJSON based on the selection prop
   useEffect(() => {
-    fetch("/Wards.geojson")
+    let geojsonFile = "";
+    if (selection === "Ward") {
+      geojsonFile = "/Wards.geojson";
+    } else if (selection === "Constituency") {
+      geojsonFile = "/Constituency.geojson";
+    } else if (selection === "Electoral District") {
+      geojsonFile = "/ElectoralDistrict.geojson";
+    }
+
+    fetch(geojsonFile)
       .then((response) => response.json())
       .then((data) => {
-        console.log("GeoJSON Data Loaded:", data); // Add a log for debugging
+        console.log("GeoJSON Data Loaded:", data);
         setGeoData(data);
       })
       .catch((error) => console.error("Error loading GeoJSON:", error));
-  }, []);
+  }, [selection]); // re-fetch when the selection changes
 
   const onEachFeature = (
     feature: { properties: { councillor: string; ward_num: string } },
@@ -67,7 +76,6 @@ const Map: React.FC = () => {
         style={{
           height: "100vh",
           width: "100%",
-          border: "1px solid red",  // Temporary for debugging
         }}
         zoomControl={true}
         scrollWheelZoom={true}
