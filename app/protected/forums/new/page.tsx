@@ -28,23 +28,11 @@ function PetitionForm() {
             required
           />
         </div>
-        <div>
-          <label htmlFor="description" className="block text-sm font-medium mb-1">Description</label>
-          <textarea
-            id="description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-md h-44"
-            required
-          />
+        <div className="p-4 border-2 bg-white max-w-4xl mx-auto rounded-lg shadow-md">
+            <Tiptap />
         </div>
-        <div className="flex justify-center">
-          <button
-            type="submit"
-            className="px-6 w-32 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
-          >
-            Post
-          </button>
+        <div className='flex justify-center'>
+            <button className="mt-4 w-32 p-2 bg-blue-500 text-white rounded hover:bg-blue-600">Post</button>
         </div>
       </form>
     </div>
@@ -120,6 +108,17 @@ function PollCreationForm() {
 function ForumCreationForm() {
   return (
     <>
+        <div className='mb-4 mx-12'>
+          <label htmlFor="title" className="block text-sm font-medium mb-1">Title</label>
+          <input
+            type="text"
+            id="title"
+            // value={title}
+            // onChange={(e) => setTitle(e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded-md"
+            required
+          />
+        </div>
       <div className="p-4 border-2 bg-white max-w-4xl mx-auto rounded-lg shadow-md">
         <Tiptap />
       </div>
