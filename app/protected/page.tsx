@@ -9,14 +9,12 @@ export default async function ProtectedPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
+  
   if (!user) {
     return redirect("/sign-in");
   }
-
-  console.log(user.id);
-
-  const { data: test } = await supabase.from('test').select()
+  
+  console.log(user.id); //e84b1c8b-6dc3-467a-8830-49b8b72708d0
 
   return (
     <div className="min-h-screen bg-background p-8">
