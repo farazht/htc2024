@@ -1,119 +1,149 @@
 import React from "react";
 import { createClient } from "@/utils/supabase/server";
+import { redirect } from "next/navigation";
+import Link from "next/link";
 
-const profile = async () => {
+interface Comment {
+  id: string;
+  title: string;
+  content: string;
+  date: string;
+  type: 'Policy' | 'Forum';
+  href: string;
+}
+
+interface Vote {
+  id: string;
+  title: string;
+  vote: number;
+  type: 'Policy' | 'Forum';
+  href: string;
+}
+
+const Profile = async () => {
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (!user) {
+    return redirect("/sign-in");
+  }
 
-  const data = {
-    comments: [
-      {
-        postTitle: "Ensuring Fair Electoral Representation (Bill 31)",
-        content:
-          "I believe this bill is essential to improve the representation of our diverse communities.",
-        date: "2024-11-01",
-      },
-      {
-        postTitle:
-          "Strengthening the Protection of Personal Information (Protection of Privacy Act, 2024)",
-        content:
-          "This is a great step forward in safeguarding personal information in our digital age.",
-        date: "2024-10-20",
-      },
-    ],
-    likedPosts: [
-      {
-        title:
-          "Modernizing Access to Information for Alberta’s Digital Age (Bill 34)",
-        author: "Alberta Government",
-        date: "2024-09-15",
-      },
-      {
-        title: "Bill S-17: Miscellaneous Statute Law Amendment Act, 2023",
-        author: "Canadian Parliament",
-        date: "2023-08-23",
-      },
-    ],
-    votedItems: [
-      {
-        title: "Supporting Bill 31 for fair electoral representation",
-        type: "Poll",
-        date: "2024-07-05",
-        vote: "Yes",
-      },
-      {
-        title: "Support for the Protection of Privacy Act, 2024",
-        type: "Poll",
-        date: "2024-06-18",
-        vote: "Yes",
-      },
-    ],
-  };
+  const [policyComments, forumComments, policyRatings, contentVotes] = await Promise.all([
+    supabase
+      .from('PolicyComments')
+      .select('policy_id, content, created_at, Policies(id, title)')
+      .eq('user_id', user.id),
+
+    supabase
+      .schema('Forum')
+      .from('ForumComment')
+      .select('content_id, comment, created_at, Content(id, title)')
+      .eq('user_id', user.id),
+
+    supabase
+      .from('PolicyRatings')
+      .select('vote, policy_id, Policies(id, title)')
+      .eq('user_id', user.id),
+
+    supabase
+      .schema('Forum')
+      .from('ContentVotes')
+      .select('vote, content_id, Content(id, title)')
+      .eq('user_id', user.id)
+  ]);
+
+  console.log('Policy Comments:', policyComments);
+  console.log('Forum Comments:', forumComments);
+
+  const comments: Comment[] = [
+    ...(policyComments?.data?.map(comment => ({
+      id: comment.policy_id,
+      title: comment.Policies?.title || 'Deleted Policy',
+      content: comment.content,
+      date: new Date(comment.created_at).toLocaleDateString(),
+      type: 'Policy',
+      href: `/protected/policies/policy/${comment.policy_id}`
+    })) || []),
+    ...(forumComments?.data?.map(comment => ({
+      id: comment.content_id,
+      title: comment.Content?.title || 'Deleted Post',
+      content: comment.comment,
+      date: new Date(comment.created_at).toLocaleDateString(),
+      type: 'Forum',
+      href: `/protected/forums/forum/${comment.content_id}`
+    })) || [])
+  ].sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
+
+  const votes: Vote[] = [
+    ...(policyRatings?.data?.map(vote => ({
+      id: vote.policy_id,
+      title: vote.Policies?.title || 'Deleted Policy',
+      vote: vote.vote,
+      type: 'Policy',
+      href: `/protected/policies/policy/${vote.policy_id}`
+    })) || []),
+    ...(contentVotes?.data?.map(vote => ({
+      id: vote.content_id,
+      title: vote.Content?.title || 'Deleted Post',
+      vote: vote.vote,
+      type: 'Forum',
+      href: `/protected/forums/forum/${vote.content_id}`
+    })) || [])
+  ];
+
+  const Card = ({ title, href, type, children }: { 
+    title: string; 
+    href: string; 
+    type: 'Policy' | 'Forum';
+    children: React.ReactNode 
+  }) => (
+    <div className="p-4 border-2 rounded-xl hover:shadow-md transition-shadow">
+      <div className="flex justify-between mb-2">
+        <Link href={href} className="font-semibold hover:text-primary hover:underline">
+          {title}
+        </Link>
+        <span className={`text-xs px-2 py-1 rounded-full ${
+          type === 'Policy' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
+        }`}>
+          {type}
+        </span>
+      </div>
+      {children}
+    </div>
+  );
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {user && (
-        <h1 className="mb-2 text-4xl font-bold text-foreground">
-          Hello {user.email}!
-        </h1>
-      )}
+    <div className="max-w-4xl mx-auto p-8">
+      <h1 className="text-4xl font-bold mb-8">Hello {user.email}!</h1>
 
-      <div className="md:col-span-2 bg-background p-6">
-        <div className="pt-6">
-          <h2 className="text-2xl font-bold mb-4">Comments on Posts</h2>
-          <div className="grid grid-cols-2 gap-4">
-            {data.comments.map((comment, index) => (
-              <div
-                key={index}
-                className="bg-background p-4 border-2 rounded-xl shadow-sm fade-in slide-up duration-300 ease-in-out transition-transform flex justify-between flex-col"
-              >
-                <h3 className="font-semibold">{comment.postTitle}</h3>
+      <section className="space-y-8">
+        <div>
+          <h2 className="text-2xl font-bold mb-4">Your Comments</h2>
+          <div className="grid md:grid-cols-2 gap-4">
+            {comments.map(comment => (
+              <Card key={comment.id} title={comment.title} href={comment.href} type={comment.type}>
                 <p className="text-sm text-secondary">{comment.date}</p>
-                <p className="mt-2 font-light">{comment.content}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="pt-6">
-          <h2 className="text-2xl font-bold mb-4">Liked Posts</h2>
-          <div>
-            {data.likedPosts.map((post, index) => (
-              <div
-                key={index}
-                className="mb-4 p-4 bg-background border-2 rounded-xl shadow-sm fade-in slide-up duration-300 ease-in-out transition-transform"
-              >
-                <h3 className="font-semibold text-lg">{post.title}</h3>
-                <p className="text-sm text-secondary">
-                  By {post.author} on {post.date}
-                </p>
-              </div>
+                <p className="mt-2 text-sm">{comment.content}</p>
+              </Card>
             ))}
           </div>
         </div>
 
-        <div className="pt-6">
-          <h2 className="text-2xl font-bold mb-4">Voted Items</h2>
-          <div>
-            {data.votedItems.map((item, index) => (
-              <div
-                key={index}
-                className="mb-4 p-4 bg-background border-2 rounded-xl shadow-sm fade-in slide-up duration-300 ease-in-out transition-transform"
-              >
-                <h3 className="font-semibold text-lg">{item.title}</h3>
-                <p className="text-sm text-secondary">
-                  {item.type} - {item.date}
-                </p>
-                <p className="mt-2">Vote: {item.vote}</p>
-              </div>
+        <div>
+          <h2 className="text-2xl font-bold mb-4">Your Votes</h2>
+          <div className="grid md:grid-cols-2 gap-4">
+            {votes.map(vote => (
+              <Card key={vote.id} title={vote.title} href={vote.href} type={vote.type}>
+                <span className={vote.vote > 0 ? 'text-green-600' : 'text-red-600'}>
+                  {vote.vote > 0 ? '👍' : '👎'}
+                </span>
+              </Card>
             ))}
           </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 };
 
-export default profile;
+export default Profile;
