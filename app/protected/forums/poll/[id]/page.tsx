@@ -2,37 +2,21 @@
 
 import { useState, useEffect } from 'react';
 import { ArrowBigUp, ArrowBigDown } from 'lucide-react';
-import CommentSection from '@/components/CommentSection'; // Only import CommentSection here
+import CommentSection from '@/components/CommentSection';
 import { createClient } from "../../../../../utils/supabase/client";
 import { useParams } from 'next/navigation';
-
-
-// Initial Poll Data (for example)
-const initialPoll = {
-  id: '1',
-  title: 'What is your favorite programming language?',
-  options: [
-    { id: '1', text: 'JavaScript', votes: 120 },
-    { id: '2', text: 'Python', votes: 80 },
-    { id: '3', text: 'Java', votes: 60 },
-    { id: '4', text: 'C++', votes: 40 },
-  ],
-  author: 'TechEnthusiast',
-  timestamp: '2023-06-15T10:30:00Z',
-  upvotes: 25,
-  downvotes: 3,
-  commentCount: 12,
-};
 
 type Poll = {
   id: number;
   title: string;
-  options: { id: string; text: string; votes: number }[];
-  author: string;
-  timestamp: Date;
+  description: string;
+  user_id: number;
+  content_type: string;
+  created_at: string;
   upvotes: number;
   downvotes: number;
-}
+  options: { id: string; text: string; votes: number }[]; // Adjust as needed
+};
 
 export default function PollVotingPage() {
   const params = useParams();
@@ -40,51 +24,114 @@ export default function PollVotingPage() {
   const [post, setPost] = useState<Poll | null>(null);
   const supabase = createClient();
   const [userVote, setUserVote] = useState<'up' | 'down' | null>(null);
-  const [poll, setPoll] = useState(initialPoll);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [hasVoted, setHasVoted] = useState(false);
   const [showResults, setShowResults] = useState(false);
 
   useEffect(() => {
-    async function fetchPoll() {
-      const { data: pollData, error } = await supabase
+    // Fetch poll data and vote counts
+    async function fetchPollData() {
+      const { data: pollData, error: pollError } = await supabase
         .schema('Forum')
         .from('Content')
         .select('*')
         .eq('id', pollId)
         .single();
-
-      if (error) {
-        console.error("Error fetching poll:", error);
+  
+      if (pollError) {
+        console.error("Error fetching poll:", pollError);
         return;
       }
-
+  
       if (pollData) {
-        setPost(pollData);
-        setPoll(pollData); // Update both state variables with the fetched data
+        // Fetch the upvote count
+        const { count: upvoteCount, error: upvoteError } = await supabase
+          .schema('Forum')
+          .from('ContentVotes')
+          .select('*', { count: 'exact', head: true })
+          .eq('content_id', pollId)
+          .eq('vote', true);
+  
+        if (upvoteError) {
+          console.error("Error fetching upvotes:", upvoteError);
+          return;
+        }
+  
+        // Fetch the downvote count
+        const { count: downvoteCount, error: downvoteError } = await supabase
+          .schema('Forum')
+          .from('ContentVotes')
+          .select('*', { count: 'exact', head: true })
+          .eq('content_id', pollId)
+          .eq('vote', false);
+  
+        if (downvoteError) {
+          console.error("Error fetching downvotes:", downvoteError);
+          return;
+        }
+  
+        // Update poll data with vote counts; user email will be fetched in the next useEffect
+        const updatedPoll = {
+          ...pollData,
+          upvotes: upvoteCount || 0,
+          downvotes: downvoteCount || 0,
+        };
+  
+        setPost(updatedPoll);
       }
     }
-
+  
     if (pollId) {
-      fetchPoll();
+      fetchPollData();
     }
   }, [pollId, supabase]);
+  
+  // Second useEffect to fetch user email based on user_id from poll data
+  useEffect(() => {
+    async function fetchUserEmail() {
+      if (post?.user_id) {
+        const { data: userEmailData, error: userEmailError } = await supabase
+          .schema('Forum')
+          .from('UserEmails')
+          .select('user_email')
+          .eq('user_id', post.user_id)
+          .single();
+  
+        if (userEmailError) {
+          console.error("Error fetching user email:", userEmailError);
+          return;
+        }
+  
+        if (userEmailData) {
+          // Update post state with user email as user_id
+          setPost((prevPost) => ({
+            ...prevPost,
+            user_id: userEmailData.user_email,
+          }));
+        }
+      }
+    }
+  
+    fetchUserEmail();
+  }, [post?.user_id, supabase]);
+  
+  
 
   const handleVote = async (voteType: 'up' | 'down') => {
     if (!post) return;
-  
+
     const voteValue = voteType === 'up';
-  
+
     // Get the current user
     const {
       data: { user },
     } = await supabase.auth.getUser();
-  
+
     if (!user) {
       console.error("User not authenticated.");
       return;
     }
-  
+
     // Check if the user has already voted on this content
     const { data: existingVote, error: fetchError } = await supabase
       .schema('Forum')
@@ -92,65 +139,65 @@ export default function PollVotingPage() {
       .select('*')
       .eq('user_id', user.id)
       .eq('content_id', post.id)
-      .maybeSingle(); // Use maybeSingle() to avoid the error when no rows are returned
-  
+      .maybeSingle();
+
     if (fetchError) {
       console.error("Error fetching existing vote:", fetchError);
       return;
     }
-  
+
     if (existingVote) {
-      // User has already voted on this post
       if (existingVote.vote === voteValue) {
-        // If the existing vote matches the new vote type, undo the vote
+        // Undo the vote
         const { error: deleteError } = await supabase
           .schema('Forum')
           .from('ContentVotes')
           .delete()
           .eq('id', existingVote.id);
-  
+
         if (deleteError) {
           console.error("Error deleting vote:", deleteError);
           return;
         }
-  
-        // Update state to reflect vote removal
+
+        // Update state
         setPost((prevPost) => {
           if (!prevPost) return null;
-          const updatedPost = { ...prevPost };
-          updatedPost[voteType === 'up' ? 'upvotes' : 'downvotes']--;
-          return updatedPost;
+          return {
+            ...prevPost,
+            upvotes: voteType === 'up' ? prevPost.upvotes - 1 : prevPost.upvotes,
+            downvotes: voteType === 'down' ? prevPost.downvotes - 1 : prevPost.downvotes,
+          };
         });
-  
-        setUserVote(null); // Reset user vote state
-  
+
+        setUserVote(null);
       } else {
-        // If the existing vote is opposite of the new vote type, update the vote
+        // Change the vote
         const { error: updateError } = await supabase
           .schema('Forum')
           .from('ContentVotes')
           .update({ vote: voteValue })
           .eq('id', existingVote.id);
-  
+
         if (updateError) {
           console.error("Error updating vote:", updateError);
           return;
         }
-  
-        // Update state to reflect the new vote type
+
+        // Update state
         setPost((prevPost) => {
           if (!prevPost) return null;
-          const updatedPost = { ...prevPost };
-          updatedPost[voteType === 'up' ? 'upvotes' : 'downvotes']++;
-          updatedPost[userVote === 'up' ? 'upvotes' : 'downvotes']--;
-          return updatedPost;
+          return {
+            ...prevPost,
+            upvotes: voteType === 'up' ? prevPost.upvotes + 1 : prevPost.upvotes - 1,
+            downvotes: voteType === 'down' ? prevPost.downvotes + 1 : prevPost.downvotes - 1,
+          };
         });
-  
-        setUserVote(voteType); // Set user vote state to new type
+
+        setUserVote(voteType);
       }
-  
     } else {
-      // No existing vote, insert a new vote
+      // Insert a new vote
       const { error: insertError } = await supabase
         .schema('Forum')
         .from('ContentVotes')
@@ -159,121 +206,28 @@ export default function PollVotingPage() {
           user_id: user.id,
           vote: voteValue,
         });
-  
-      if (insertError) {
-        console.error("Error inserting vote:", insertError);
-        return;
-      }
-  
-      // Update state to reflect new vote
-      setPost((prevPost) => {
-        if (!prevPost) return null;
-        const updatedPost = { ...prevPost };
-        updatedPost[voteType === 'up' ? 'upvotes' : 'downvotes']++;
-        return updatedPost;
-      });
-  
-      setUserVote(voteType); // Set user vote state to new type
-    }
-  };
-
-  const handleOptionSelect = (optionId: string) => {
-    if (!hasVoted) {
-      setSelectedOption(optionId);
-    }
-  };
-
-  const handlePollVote = async () => {
-    if (!post) return;
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      console.error("User not authenticated.");
-      return;
-    }
-
-    const { data: existingChoice, error: fetchError } = await supabase
-      .schema('Forum')
-      .from('PollVotes')
-      .select('*')
-      .eq('user_id', user.id)
-      .eq('poll_id', post.id)
-      .maybeSingle(); 
-
-    if (fetchError) {
-      console.error("Error fetching existing vote:", fetchError);
-      return;
-    }
-
-    if (existingChoice) {
-      if (existingChoice.choice === selectedOption) {
-        // If the existing vote matches the new vote type, undo the vote
-        const { error: deleteError } = await supabase
-          .schema('Forum')
-          .from('PollVotes')
-          .delete()
-          .eq('id', existingChoice.id);
-        if (deleteError) {
-          console.error("Error deleting vote:", deleteError);
-          return;
-        }
-        setPost((prevPost) => {
-          if (!prevPost) return null;
-          const updatedPost = { ...prevPost };
-          updatedPost.options.forEach((option) => {
-            if (option.id === selectedOption) option.votes--;
-          });
-          return updatedPost;
-        });
-        setSelectedOption(null);
-      } else {
-        // If the existing vote is opposite of the new vote type, update the vote
-        const { error: updateError } = await supabase
-          .schema('Forum')
-          .from('PollVotes')
-          .update({ choice: selectedOption })
-          .eq('id', existingChoice.id);
-        if (updateError) {
-          console.error("Error updating vote:", updateError);
-          return;
-        }
-        setPost((prevPost) => {
-          if (!prevPost) return null;
-          const updatedPost = { ...prevPost };
-          updatedPost.options.forEach((option) => {
-            if (option.id === selectedOption) option.votes++;
-          });
-          return updatedPost;
-        });
-        setSelectedOption(selectedOption);
-      }
-    } else {
-      // No existing vote, insert a new vote
-      const { error: insertError } = await supabase
-        .schema('Forum')
-        .from('PollVotes')
-        .insert({ poll_id: post.id, user_id: user.id, choice: selectedOption });
 
       if (insertError) {
         console.error("Error inserting vote:", insertError);
         return;
       }
+
+      // Update state
       setPost((prevPost) => {
         if (!prevPost) return null;
-        const updatedPost = { ...prevPost };
-        updatedPost.options.forEach((option) => {
-          if (option.id === selectedOption) option.votes++;
-        });
-        return updatedPost;
+        return {
+          ...prevPost,
+          upvotes: voteType === 'up' ? prevPost.upvotes + 1 : prevPost.upvotes,
+          downvotes: voteType === 'down' ? prevPost.downvotes + 1 : prevPost.downvotes,
+        };
       });
 
-      setSelectedOption(selectedOption);
+      setUserVote(voteType);
     }
   };
 
-  const formatDate = (timestamp: string) => {
+  const formatDate = (timestamp?: string) => {
+    if (!timestamp) return '';
     const date = new Date(timestamp);
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
@@ -286,10 +240,10 @@ export default function PollVotingPage() {
     });
   };
 
-  const totalVotes = poll?.options?.reduce((sum, option) => sum + option.votes, 0);
+  const totalVotes = post?.options?.reduce((sum, option) => sum + option.votes, 0);
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-4">
+    <div className="min-h-screen bg-background text-foreground p-4 w-full">
       <div className="max-w-3xl mx-auto">
         <div className="flex items-start space-x-4">
           <div className="flex flex-col items-center space-y-2">
@@ -300,7 +254,9 @@ export default function PollVotingPage() {
             >
               <ArrowBigUp className="w-6 h-6" />
             </button>
-            <span className="font-bold">{poll.upvotes - poll.downvotes}</span>
+            <span className="font-bold">
+              {(post?.upvotes || 0) - (post?.downvotes || 0)}
+            </span>
             <button
               onClick={() => handleVote('down')}
               className={`p-1 rounded ${userVote === 'down' ? 'text-blue-500' : 'text-gray-500 hover:text-gray-700'}`}
@@ -310,12 +266,12 @@ export default function PollVotingPage() {
             </button>
           </div>
           <div className="flex-1">
-            <h1 className="text-2xl font-bold mb-2">{poll.title}</h1>
+            <h1 className="text-2xl font-bold mb-2">{post?.title}</h1>
             <div className="text-sm text-gray-500 mb-4">
-              Posted by {poll.author} on {formatDate(poll.timestamp)}
+              Posted by {post?.user_id} on {formatDate(post?.created_at)}
             </div>
             <div className="space-y-4">
-              {poll?.options?.map((option) => (
+              {post?.options?.map((option) => (
                 <div key={option.id} className="flex items-center space-x-2">
                   <input
                     type="radio"
@@ -323,7 +279,7 @@ export default function PollVotingPage() {
                     name="poll-option"
                     value={option.id}
                     checked={selectedOption === option.id}
-                    onChange={() => handleOptionSelect(option.id)}
+                    onChange={() => setSelectedOption(option.id)}
                     disabled={hasVoted || showResults}
                     className="form-radio h-4 w-4 text-blue-600"
                   />
@@ -332,7 +288,7 @@ export default function PollVotingPage() {
                   </label>
                   {(hasVoted || showResults) && (
                     <div className="text-sm text-gray-500">
-                      {option.votes} votes ({((option.votes / totalVotes) * 100).toFixed(1)}%)
+                      {option.votes} votes ({((option.votes / (totalVotes || 1)) * 100).toFixed(1)}%)
                     </div>
                   )}
                 </div>
@@ -340,7 +296,7 @@ export default function PollVotingPage() {
             </div>
             <div className="flex space-x-4 mt-4">
               <button
-                onClick={handlePollVote}
+                onClick={() => setHasVoted(true)}
                 disabled={!selectedOption || hasVoted}
                 className="px-4 py-2 bg-blue-500 text-background rounded disabled:bg-gray-300 disabled:cursor-not-allowed"
               >
@@ -356,8 +312,8 @@ export default function PollVotingPage() {
             </div>
           </div>
         </div>
-        
-        {/* Render CommentSection as the only comment component */}
+
+        {/* Render CommentSection */}
         <div className="mt-8 space-y-4">
           <CommentSection content_id={Number(pollId)} />
         </div>
