@@ -8,6 +8,7 @@ import "./globals.css";
 import { Footer } from "@/components/Footer";
 import Image from "next/image";
 import Logo from "../components/Logo.png";
+import Chatbox from "@/components/Chatbox";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -63,6 +64,7 @@ export default function RootLayout({
               </footer>
             </div>
           </main>
+        <Chatbox></Chatbox>
         </ThemeProvider>
       </body>
     </html>
