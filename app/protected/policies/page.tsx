@@ -27,7 +27,7 @@ export default function Policies() {
     const filteredPolicies = policies.filter(policy => 
       (searchTerm === "" || policy.title.toLowerCase().includes(searchTerm.toLowerCase()) || policy.summary.toLowerCase().includes(searchTerm.toLowerCase())) &&
       (selectedTopic === null || policy.tags.includes(selectedTopic)) && // Use tags instead of topics
-      (selectedLevel === null || policy.level_of_government.includes(selectedLevel)) // Filter by level of government
+      (selectedLevel === null || (policy.level_of_government && policy.level_of_government.includes(selectedLevel))) // Check for null before includes
     );
 
     useEffect(() => {
