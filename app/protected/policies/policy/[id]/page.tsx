@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { createClient } from '../../../../../utils/supabase/client'
 import { RetrieveSinglePolicy, RetrieveComments, InsertComment, RetrievePolicyRatings, RetrieveUserId, InsertLikesDislikes, checkForLikeDislike  } from '@/utils/supabaseCall'
+import { FaExternalLinkAlt } from "react-icons/fa";
 
 export default function PolicyPage() {
   const { id } = useParams();
@@ -146,9 +147,14 @@ const handleDislike = async () => {
 };
 
   return (
-    <div className="min-h-screen bg-white p-8 text-black">
+    <div className="min-h-screen bg-background p-8 text-foreground">
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-4xl font-bold mb-4">{policy?.title}</h1>
+        <div className="flex items-center mb-4">
+            <h1 className="text-4xl font-bold">{policy?.title}</h1>
+            <a href={policy?.link} target="_blank" rel="noopener noreferrer">
+                <FaExternalLinkAlt className="ml-2" />
+            </a>
+        </div>
         <div className="flex mb-2">
           <div className="flex items-center mr-4">
             <span className="font-semibold">Policy ID:</span>
@@ -172,14 +178,14 @@ const handleDislike = async () => {
           <div className="flex justify-between mb-2">
             <button 
               onClick={handleLike} 
-              className={`mr-2 ${hasLiked ? 'bg-blue-600 text-white' : 'bg-gray-200 text-black'}`} 
+              className={`mr-2 px-4 py-1 rounded-full ${hasLiked ? 'bg-blue-600 text-background' : 'bg-foreground text-background'}`} 
               disabled={hasLiked}
             >
               Like {likes}
             </button>
             <button 
               onClick={handleDislike} 
-              className={`${hasDisliked ? 'bg-red-600 text-white' : 'bg-gray-200 text-black'}`} 
+              className={`px-4 py-1 rounded-full ${hasDisliked ? 'bg-red-600 text-background' : 'bg-foreground text-background'}`} 
               disabled={hasDisliked}
             >
               Dislike {dislikes}
@@ -221,7 +227,7 @@ const handleDislike = async () => {
               ></textarea>
               <button
                 type="submit"
-                className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                className="mt-2 px-4 py-2 bg-blue-500 text-background rounded hover:bg-blue-600"
               >
                 Submit Comment
               </button>
