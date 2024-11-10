@@ -120,7 +120,7 @@ export default function PetitionView() {
                 </div>
                 <button
                   type="submit"
-                  className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors"
+                  className="w-full bg-blue-500 text-background py-2 px-4 rounded hover:bg-blue-600 transition-colors"
                 >
                   Sign the Petition
                 </button>

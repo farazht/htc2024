@@ -1,9 +1,10 @@
-"use client";
+'use client';
 
 import { useState } from 'react';
 import { ArrowBigUp, ArrowBigDown } from 'lucide-react';
+import CommentSection from '@/components/CommentSection'; // Only import CommentSection here
 
-// This would typically come from your API or database
+// Initial Poll Data (for example)
 const initialPoll = {
   id: '1',
   title: 'What is your favorite programming language?',
@@ -25,10 +26,10 @@ export default function PollVotingPage() {
   const [userVote, setUserVote] = useState<'up' | 'down' | null>(null);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [hasVoted, setHasVoted] = useState(false);
-  const [showResults, setShowResults] = useState(false); // New state for toggling results
+  const [showResults, setShowResults] = useState(false);
 
   const handleVote = (voteType: 'up' | 'down') => {
-    setPoll(prevPoll => {
+    setPoll((prevPoll) => {
       const newPoll = { ...prevPoll };
       if (userVote === voteType) {
         newPoll[voteType === 'up' ? 'upvotes' : 'downvotes']--;
@@ -52,9 +53,9 @@ export default function PollVotingPage() {
 
   const handlePollVote = () => {
     if (selectedOption && !hasVoted) {
-      setPoll(prevPoll => {
+      setPoll((prevPoll) => {
         const newPoll = { ...prevPoll };
-        const updatedOptions = newPoll.options.map(option =>
+        const updatedOptions = newPoll.options.map((option) =>
           option.id === selectedOption ? { ...option, votes: option.votes + 1 } : option
         );
         return { ...newPoll, options: updatedOptions };
@@ -80,7 +81,7 @@ export default function PollVotingPage() {
   const totalVotes = poll.options.reduce((sum, option) => sum + option.votes, 0);
 
   return (
-    <div className="min-h-screen bg-white text-black p-4">
+    <div className="min-h-screen bg-background text-foreground p-4">
       <div className="max-w-3xl mx-auto">
         <div className="flex items-start space-x-4">
           <div className="flex flex-col items-center space-y-2">
@@ -106,7 +107,7 @@ export default function PollVotingPage() {
               Posted by {poll.author} on {formatDate(poll.timestamp)}
             </div>
             <div className="space-y-4">
-              {poll.options.map(option => (
+              {poll.options.map((option) => (
                 <div key={option.id} className="flex items-center space-x-2">
                   <input
                     type="radio"
@@ -133,19 +134,24 @@ export default function PollVotingPage() {
               <button
                 onClick={handlePollVote}
                 disabled={!selectedOption || hasVoted}
-                className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-blue-500 text-background rounded disabled:bg-gray-300 disabled:cursor-not-allowed"
               >
                 {hasVoted ? 'Voted' : 'Cast Vote'}
               </button>
               <button
                 onClick={() => setShowResults(true)}
                 disabled={showResults}
-                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                className="px-4 py-2 bg-gray-500 text-background rounded hover:bg-gray-600"
               >
                 Show Results
               </button>
             </div>
           </div>
+        </div>
+        
+        {/* Render CommentSection as the only comment component */}
+        <div className="mt-8 space-y-4">
+          <CommentSection />
         </div>
       </div>
     </div>
