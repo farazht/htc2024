@@ -38,9 +38,10 @@ function CommentComponent({
             <p className="text-sm text-secondary">{comment.content}</p>
             <div className="flex items-center justify-start">
               <Button
-                variant="link"
+                variant="outline"
                 size="sm"
                 onClick={() => setShowReplyInput(!showReplyInput)}
+                className="bg-muted text-foreground"
               >
                 Reply
               </Button>
