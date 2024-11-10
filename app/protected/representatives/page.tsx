@@ -97,8 +97,7 @@ import Map from "@/components/Map";
 
 const Representatives: React.FC = () => {
   return (
-    <div>
-      <h1>Calgary Representatives Map</h1>
+    <div className="min-w-full">
       <Map />
     </div>
   );
