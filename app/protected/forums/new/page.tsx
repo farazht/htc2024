@@ -3,15 +3,21 @@
 import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import Tiptap from '../../../../components/Tiptap';
+import {createClient} from "../../../../utils/supabase/client";
 
 // Petition Form Component
 function PetitionForm() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
 
+  const handleEditorContentChange = (content: string) => {
+    setDescription(content);
+    console.log(content)
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission here
+    // Handle form submission here, using title and description
   };
 
   return (
@@ -29,7 +35,7 @@ function PetitionForm() {
           />
         </div>
         <div className="p-4 border-2 bg-white max-w-4xl mx-auto rounded-lg shadow-md">
-            <Tiptap />
+            <Tiptap onContentChange={handleEditorContentChange} />
         </div>
         <div className='flex justify-center'>
             <button className="mt-4 w-32 p-2 bg-blue-500 text-white rounded hover:bg-blue-600">Post</button>
@@ -106,25 +112,58 @@ function PollCreationForm() {
 
 // Forum Creation Form Component
 function ForumCreationForm() {
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+
+  const handleEditorContentChange = (content: string) => {
+    setContent(content);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const supabase = createClient();
+
+    const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+    const { error } = await supabase
+        .schema('Forum')
+        .from('Content')
+        .insert({
+          author_id: user?.id,
+          description: content,
+          content_type: "Forum",
+          title: title,
+        });
+
+    if (error) {
+      console.error('Error creating forum:', error);
+      return;
+    }
+  };
+
   return (
     <>
-        <div className='mb-4 mx-12'>
+      <form onSubmit={handleSubmit} className='mb-4 mx-12'>
+        <div>
           <label htmlFor="title" className="block text-sm font-medium mb-1">Title</label>
           <input
             type="text"
             id="title"
-            // value={title}
-            // onChange={(e) => setTitle(e.target.value)}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
             className="w-full p-2 border border-gray-300 rounded-md"
             required
           />
         </div>
-      <div className="p-4 border-2 bg-white max-w-4xl mx-auto rounded-lg shadow-md">
-        <Tiptap />
-      </div>
-      <div className='flex justify-center'>
-        <button className="mt-4 w-32 p-2 bg-blue-500 text-white rounded hover:bg-blue-600">Post</button>
-      </div>
+        <div className="p-4 border-2 bg-white max-w-4xl mx-auto rounded-lg shadow-md">
+          <Tiptap onContentChange={handleEditorContentChange} />
+        </div>
+        <div className='flex justify-center'>
+          <button type="submit" className="mt-4 w-32 p-2 bg-blue-500 text-white rounded hover:bg-blue-600">Post</button>
+        </div>
+      </form>
     </>
   );
 }
