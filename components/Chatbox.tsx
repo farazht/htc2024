@@ -149,7 +149,7 @@ export default function Chatbox() {
       )}
       <Button
         onClick={toggleChat}
-        className="fixed bottom-4 right-4 rounded-full w-16 h-16 flex items-center justify-center z-50"
+        className="fixed bottom-24 right-14 rounded-full w-16 h-16 flex items-center justify-center z-50"
         aria-label="Open chat"
       >
         <HiSparkles size={24} color='white' />

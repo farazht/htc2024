@@ -10,7 +10,7 @@ export default async function Index() {
     <main className="container mx-auto px-4 py-12">
       <section className="mb-16 text-center">
         <h1 className="text-5xl font-bold mb-6">Welcome to BillBoard</h1>
-        <p className="text-xl mb-8">
+        <p className="text-xl mb-8 text-secondary">
           Your go-to platform for keeping up with the latest policies, starting
           community discussions, creating petitions, and running polls –
           empowering you to make a difference!
@@ -23,12 +23,14 @@ export default async function Index() {
           <h2 className="text-2xl font-semibold mb-2">
             New and Proposed Legislation
           </h2>
-          <p>Keep up to date with the latest policies!</p>
+          <p className="text-secondary">
+            Keep up to date with the latest policies!
+          </p>
         </div>
         <div className="text-center">
           <MessagesSquare className="mx-auto h-12 w-12 mb-4" />
           <h2 className="text-2xl font-semibold mb-2">Discussion Board</h2>
-          <p>
+          <p className="text-secondary">
             Start discussions, create petitions, and run polls within your
             community and make your voice heard!
           </p>
@@ -36,7 +38,7 @@ export default async function Index() {
         <div className="text-center">
           <BookUser className="mx-auto h-12 w-12 mb-4" />
           <h2 className="text-2xl font-semibold mb-2">Local Representatives</h2>
-          <p>
+          <p className="text-secondary">
             Find out who your local representative at every level of government
             is, and how to contact them!
           </p>
@@ -44,7 +46,7 @@ export default async function Index() {
       </section>
       <section className="text-center mb-16">
         <h2 className="text-3xl font-bold mb-6">Join BillBoard Today</h2>
-        <p className="text-xl mb-8">
+        <p className="text-xl mb-8 text-secondary">
           Be part of the change. Sign up now to start engaging with your
           community and making your voice heard!
         </p>
