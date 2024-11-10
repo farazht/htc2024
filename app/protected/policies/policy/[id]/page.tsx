@@ -12,6 +12,8 @@ export default function PolicyPage() {
   const [newComment, setNewComment] = useState<string>('');
   const [likes, setLikes] = useState<number>(0);
   const [dislikes, setDislikes] = useState<number>(0);
+  const [hasLiked, setHasLiked] = useState<boolean>(false);
+  const [hasDisliked, setHasDisliked] = useState<boolean>(false);
 
 
   interface Policy {
@@ -104,6 +106,8 @@ const handleLike = async () => {
     // Check if result is not null before accessing error
     if (result && !result.error) {
       setLikes(likes + 1);
+      setHasLiked(true);
+      setHasDisliked(false); // Reset dislike state
       if (existingVote) {
         // If there was an existing vote, adjust likes/dislikes accordingly
         setDislikes(dislikes - 1); // Decrease dislikes if they were previously disliked
@@ -127,6 +131,8 @@ const handleDislike = async () => {
     // Check if result is not null before accessing error
     if (result && !result.error) {
       setDislikes(dislikes + 1);
+      setHasDisliked(true);
+      setHasLiked(false); // Reset like state
       if (existingVote) {
         // If there was an existing vote, adjust likes/dislikes accordingly
         setLikes(likes - 1); // Decrease likes if they were previously liked
@@ -164,8 +170,20 @@ const handleDislike = async () => {
         <div className="mb-8">
           <h2 className="text-2xl font-semibold mb-2">Public Opinion</h2>
           <div className="flex justify-between mb-2">
-            <button onClick={handleLike} className="mr-2">Like {likes}</button>
-            <button onClick={handleDislike}>Dislike {dislikes}</button>
+            <button 
+              onClick={handleLike} 
+              className={`mr-2 ${hasLiked ? 'bg-blue-600 text-white' : 'bg-gray-200 text-black'}`} 
+              disabled={hasLiked}
+            >
+              Like {likes}
+            </button>
+            <button 
+              onClick={handleDislike} 
+              className={`${hasDisliked ? 'bg-red-600 text-white' : 'bg-gray-200 text-black'}`} 
+              disabled={hasDisliked}
+            >
+              Dislike {dislikes}
+            </button>
           </div>
           <div className="h-6 bg-gray-200 rounded-full overflow-hidden">
             <div
