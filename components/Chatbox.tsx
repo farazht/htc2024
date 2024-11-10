@@ -25,8 +25,8 @@ export default function Chatbox() {
           <div className="bg-background border rounded-lg shadow-lg w-full max-w-md flex flex-col h-[80vh] max-h-[600px]">
             <div className="flex justify-between items-center p-4 border-b">
               <h2 className="text-lg font-semibold">BillBoardBot</h2>
-              <Button variant="ghost" size="icon" onClick={toggleChat} aria-label="Close chat">
-                <X className="h-4 w-4" />
+              <Button variant="ghost" size="icon" onClick={toggleChat} aria-label="Close chat" className="hover:bg-primary">
+                <X className="h-4 w-4" fill={"blue"}/>
               </Button>
             </div>
             <div className="flex-1 overflow-y-auto p-4" style={{ height: 'calc(100% - 130px)' }}>
