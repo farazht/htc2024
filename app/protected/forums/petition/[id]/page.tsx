@@ -231,7 +231,8 @@ export default function PetitionView() {
     }
   };
 
-  const formatDate = (timestamp: string) => {
+  const formatDate = (timestamp: Date | undefined) => {
+    if (!timestamp) return 'Invalid date';
     const date = new Date(timestamp);
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
@@ -244,7 +245,7 @@ export default function PetitionView() {
     });
   };
 
-  const handleSign = async (e) => {
+  const handleSign = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
     if (firstName && lastName && petition) {  // Ensure petition data is available
       try {
@@ -322,11 +323,11 @@ export default function PetitionView() {
           <div className="flex-1">
             <h1 className="text-2xl font-bold mb-2">{petition?.title}</h1>
             <div className="text-sm text-gray-500 mb-4">
-              Started on {formatDate(petition?.timestamp)}
+              Started on {petition?.timestamp ? formatDate(petition.timestamp) : 'Unknown date'}
             </div>
             <div 
               className="prose max-w-none mb-6"
-              dangerouslySetInnerHTML={{ __html: petition?.description }}
+              dangerouslySetInnerHTML={{ __html: petition?.description || '' }}
             />
             <div>
             <div className="bg-gray-100 p-4 rounded-lg mb-6">
@@ -338,7 +339,7 @@ export default function PetitionView() {
                     placeholder="First Name"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
-                    className="flex-1 p-2 border border-gray-300 rounded"
+                    className="flex-1 p-2 border border-secondary rounded"
                     required
                   />
                   <input
@@ -346,7 +347,7 @@ export default function PetitionView() {
                     placeholder="Last Name"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
-                    className="flex-1 p-2 border border-gray-300 rounded"
+                    className="flex-1 p-2 border border-secondary rounded"
                     required
                   />
                 </div>
@@ -370,7 +371,7 @@ export default function PetitionView() {
             </div>
             </div>
             <div className="mt-8 space-y-4">
-              <CommentSection content_id={petition?.id} />
+              <CommentSection content_id={petition?.id ?? 0} />
             </div>
           </div>
         </div>
