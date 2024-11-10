@@ -4,8 +4,11 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
 const Map: React.FC = () => {
-  const handleMarkerClick = () => {
-    alert("Marker clicked!"); // You can replace this with any action you want
+  const handleMarkerClick = ({ name }: { name: string }) => {
+    switch (name) {
+      case "Calgary Center":
+        alert("Calgary Center");
+    }
   };
 
   const mpData: {
@@ -45,7 +48,11 @@ const Map: React.FC = () => {
         attribution='&copy; <a href="https://carto.com/attributions">CARTO</a>'
       />
       {mpData.map((mp, index) => (
-        <Marker key={index} position={mp.position}>
+        <Marker
+          key={index}
+          position={mp.position}
+          eventHandlers={{ click: () => handleMarkerClick({ name: mp.name }) }}
+        >
           <Popup>
             <strong>{mp.name}</strong>
             <br />
