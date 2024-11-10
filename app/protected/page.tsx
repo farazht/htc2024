@@ -39,7 +39,7 @@ export default async function ProtectedPage() {
             </p>
           </div>
           <div>
-            <Link href="/policies" className="text-blue-600 hover:underline">
+            <Link href="/protected/policies" className="text-blue-600 hover:underline">
               Learn more
             </Link>
           </div>
@@ -64,7 +64,7 @@ export default async function ProtectedPage() {
             </p>
           </div>
           <div>
-            <Link href="/forums" className="text-blue-600 hover:underline">
+            <Link href="/protected/forums" className="text-blue-600 hover:underline">
               Join the conversation
             </Link>
           </div>
@@ -89,7 +89,7 @@ export default async function ProtectedPage() {
             </p>
           </div>
           <div>
-            <Link href="/profile" className="text-blue-600 hover:underline">
+            <Link href="/protected/profile" className="text-blue-600 hover:underline">
               View profile
             </Link>
           </div>
@@ -114,7 +114,7 @@ export default async function ProtectedPage() {
             </p>
           </div>
           <div>
-            <Link href="/representatives" className="text-blue-600 hover:underline">
+            <Link href="/protected/representatives" className="text-blue-600 hover:underline">
               Meet your representatives
             </Link>
           </div>
