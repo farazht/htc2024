@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation'
 import { createClient } from '../../../../../utils/supabase/client'
 import { RetrieveSinglePolicy, RetrieveComments, InsertComment, RetrievePolicyRatings, RetrieveUserId, InsertLikesDislikes, checkForLikeDislike  } from '@/utils/supabaseCall'
 import { FaExternalLinkAlt } from "react-icons/fa";
+import PolicyCommentSection from '@/components/PolicyCommentSection';
 
 export default function PolicyPage() {
   const { id } = useParams();
@@ -15,7 +16,6 @@ export default function PolicyPage() {
   const [dislikes, setDislikes] = useState<number>(0);
   const [hasLiked, setHasLiked] = useState<boolean>(false);
   const [hasDisliked, setHasDisliked] = useState<boolean>(false);
-
 
   interface Policy {
     id: number
@@ -249,6 +249,9 @@ const handleDislike = async () => {
               </div>
             ))}
           </div> */}
+          <div className="mt-8 space-y-4">
+            <PolicyCommentSection policy_id={Number(id)} />
+          </div>
         </div>
       </div>
     </div>
