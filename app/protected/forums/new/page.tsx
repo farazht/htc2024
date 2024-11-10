@@ -13,13 +13,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
 import { useRouter } from "next/navigation";
-import router from "next/router";
-import Link from "next/link";
 
 // Petition Form Component
 function PetitionForm() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const router = useRouter();
 
   const handleEditorContentChange = (content: string) => {
     setDescription(content);
@@ -50,7 +49,8 @@ function PetitionForm() {
 
     setTimeout(() => {
       if (element) element.classList.add("opacity-0");
-    }, 2000);
+      router.push("/protected/forums");
+    }, 1000);
 
     setTimeout(() => {
       if (element) element.classList.remove("opacity-0");
@@ -109,6 +109,8 @@ function PollCreationForm() {
   const [question, setQuestion] = useState("");
   const [answers, setAnswers] = useState(["", ""]);
 
+  const router = useRouter();
+
   const addAnswer = () => setAnswers([...answers, ""]);
   const removeAnswer = (index: number) => {
     if (answers.length > 2) {
@@ -151,7 +153,8 @@ function PollCreationForm() {
 
     setTimeout(() => {
       if (element) element.classList.add("opacity-0");
-    }, 2000);
+      router.push("/protected/forums");
+    }, 1000);
 
     setTimeout(() => {
       if (element) element.classList.remove("opacity-0");
@@ -267,6 +270,7 @@ function PollCreationForm() {
 function ForumCreationForm() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const router = useRouter();
 
   const handleEditorContentChange = (content: string) => {
     setContent(content);
@@ -296,7 +300,8 @@ function ForumCreationForm() {
 
     setTimeout(() => {
       if (element) element.classList.add("opacity-0");
-    }, 2000);
+      router.push("/protected/forums");
+    }, 1000);
 
     setTimeout(() => {
       if (element) element.classList.remove("opacity-0");
