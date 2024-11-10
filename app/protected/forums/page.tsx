@@ -1,49 +1,97 @@
-"use client";
+'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { createClient } from "../../../utils/supabase/client";
+import Link from 'next/link';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown, Search, ThumbsUp } from 'lucide-react';
+import { ChevronDown, Search, ThumbsDown, ThumbsUp } from 'lucide-react';
 
-// Simulated forum post data
-const forumPosts = [
-  { id: 1, title: "Welcome to our new forum!", upvotes: 120, timestamp: new Date('2023-06-01') },
-  { id: 2, title: "Tips for beginners", upvotes: 85, timestamp: new Date('2023-06-10') },
-  { id: 3, title: "Advanced techniques discussion", upvotes: 200, timestamp: new Date('2023-06-15') },
-  { id: 4, title: "Weekly challenge thread", upvotes: 50, timestamp: new Date('2023-06-20') },
-  { id: 5, title: "Community spotlight", upvotes: 150, timestamp: new Date('2023-06-25') },
-];
+const supabase = createClient();
+
+type ForumPost = {
+  id: number;
+  title: string;
+  rating: number;
+  timestamp: Date;
+  content_type: string; // Add this based on your URL structure, or replace with correct field name
+};
 
 export default function ForumSection() {
   const [sortOption, setSortOption] = useState('new');
   const [searchQuery, setSearchQuery] = useState('');
+  const [forumPosts, setForumPosts] = useState<ForumPost[]>([]);
   const router = useRouter();
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const { data, error } = await supabase
+          .schema('Forum')
+          .from('Content') // Replace 'Content' with your actual table name
+          .select(`
+            *,
+            ContentVotes (
+              vote
+            )
+          `);
+  
+        if (error) {
+          console.error("Error fetching posts:", error);
+          return;
+        }
+  
+        // Format the data to include the calculated rating
+        const formattedData = data?.map(post => {
+          // Sum the upvotes and downvotes from ContentVotes
+          const rating = post.ContentVotes.reduce((sum, vote) => {
+            return sum + (vote.is_upvote ? 1 : -1);
+          }, 0);
+  
+          return {
+            ...post,
+            timestamp: new Date(post.created_at), // Convert created_at to Date object
+            rating, // Add the calculated rating
+          };
+        }) || [];
+  
+        setForumPosts(formattedData);
+        console.log(formattedData);
+
+
+      } catch (err) {
+        console.error("Unexpected error:", err);
+      }
+    };
+  
+    fetchPosts();
+  }, []); // Empty dependency array ensures this runs only once
+  
 
   const sortPosts = (posts: typeof forumPosts) => {
     switch (sortOption) {
       case 'new':
-        return [...posts].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+        return [...posts].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()); 
       case 'top-today':
-        return [...posts].sort((a, b) => b.upvotes - a.upvotes);
+        return [...posts].sort((a, b) => b.rating - a.rating);
       case 'top-month':
       case 'top-year':
       case 'top-all':
-        // For simplicity, these all sort by upvotes. In a real app, you'd filter by date range too.
-        return [...posts].sort((a, b) => b.upvotes - a.upvotes);
+        return [...posts].sort((a, b) => b.rating - a.rating);
       default:
         return posts;
     }
   };
+  
 
   const handleNewPost = (type: string) => {
-    // Navigate to /new with a query parameter 'type'
     router.push(`/protected/forums/new?type=${type}`);
   };
 
@@ -52,7 +100,7 @@ export default function ForumSection() {
   ));
 
   return (
-    <div className="max-w-4xl mx-auto py-4 px-12 w-full">
+    <div className="max-w-4xl mx-auto py-4 px-12 w-full flex flex-col justify-start min-h-screen">
       <div className="mb-6 flex w-full gap-4">
         <Input
           type="text"
@@ -105,22 +153,31 @@ export default function ForumSection() {
 
       <div className="space-y-4">
         {filteredAndSortedPosts.map((post) => (
-          <div key={post.id} className="bg-background text-foreground border-2 rounded-md shadow-sm my-2 p-4">
-            <div>
-              <div>{post.title}</div>
-            </div>
-            <div className="flex justify-between items-center">
-              <div className="flex items-center">
-                <ThumbsUp className="mr-2 h-4 w-4" />
-                <span>{post.upvotes} upvotes</span>
+          <Link key={post.id} href={`/protected/forums/${post.content_type}/${post.id}`} passHref>
+            <div className="bg-background text-foreground border-2 rounded-md shadow-sm my-2 py-4 p-4 cursor-pointer flex flex-row justify-between">
+              <div>
+                <div>{post.title}</div>
+                {/* Rating Label */}
+                <div className="flex items-center mt-2">
+                  {post.rating >= 0 ? (
+                    <ThumbsUp className="mr-1 h-4 w-4 text-green-500" />
+                  ) : (
+                    <ThumbsDown className="mr-1 h-4 w-4 text-red-500" />
+                  )}
+                  <span className={`text-sm font-semibold ${post.rating >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {post.rating}
+                  </span>
+                </div>
               </div>
               <span className="text-sm text-gray-500">
                 {post.timestamp.toLocaleDateString()}
               </span>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
+
+
     </div>
   );
 }
