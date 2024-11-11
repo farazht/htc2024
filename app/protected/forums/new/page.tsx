@@ -4,17 +4,16 @@ import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import Tiptap from "../../../../components/Tiptap";
 import { createClient } from "../../../../utils/supabase/client";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/ui/Dropdown";
 import { ChevronDown } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-// Petition Form Component
 function PetitionForm() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -160,7 +159,6 @@ function PollCreationForm() {
       if (element) element.classList.remove("opacity-0");
     }, 100);
 
-    // Then, insert all poll choices
     const pollChoices = answers.map((answer) => ({
       content_id: pollData.id,
       description: answer,

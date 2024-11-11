@@ -5,7 +5,7 @@ import { ArrowBigUp, ArrowBigDown } from "lucide-react";
 import { createClient } from "../../../../../utils/supabase/client";
 import CommentSection from "@/components/CommentSection";
 
-// Initialize Supabase client
+// initialize supabase
 const supabase = createClient();
 
 type ForumPost = {
@@ -34,7 +34,6 @@ export default function PetitionView() {
   const [signatures, setSignatures] = useState<Signature[]>([]);
 
   useEffect(() => {
-    // Fetch petition and voting information on component mount
     const fetchPetitionData = async () => {
       try {
         const { data, error } = await supabase
@@ -53,7 +52,7 @@ export default function PetitionView() {
             )
           `
           )
-          .eq("id", 39) // Fetch petition with a known ID (or replace 1 with a dynamic value as needed)
+          .eq("id", 39)
           .single();
 
         if (error) {
@@ -62,7 +61,6 @@ export default function PetitionView() {
         }
 
         if (data) {
-          // Calculate upvotes and downvotes from ContentVotes
           const { upvotes, downvotes } = data.ContentVotes?.reduce(
             (acc, vote) => {
               if (vote.vote === true) acc.upvotes++;
@@ -72,7 +70,6 @@ export default function PetitionView() {
             { upvotes: 0, downvotes: 0 }
           ) || { upvotes: 0, downvotes: 0 };
 
-          // Set petition data to match ForumPost type
           const formattedPetition: ForumPost = {
             id: data.id,
             title: data.title,
@@ -97,25 +94,24 @@ export default function PetitionView() {
 
   useEffect(() => {
     const fetchSignatures = async () => {
-      if (!petition) return; // Only fetch signatures if petition data is available
+      if (!petition) return;
 
       try {
         const { data, error } = await supabase
           .schema("Forum")
           .from("Signatures")
           .select("f_name, l_name")
-          .eq("petition_id", petition.id); // Use the actual petition ID
+          .eq("petition_id", petition.id);
 
         if (error) {
           console.error("Error fetching signatures: ", error);
           return;
         }
 
-        // Map data to create an array of objects with firstName and lastName keys
         const formattedSignatures = data.map((sig) => ({
           firstName: sig.f_name,
           lastName: sig.l_name,
-          email: `${sig.f_name.toLowerCase()}.${sig.l_name.toLowerCase()}@example.com`, // Mock email format
+          email: `${sig.f_name.toLowerCase()}.${sig.l_name.toLowerCase()}@example.com`,
         }));
 
         setSignatures(formattedSignatures);
@@ -125,14 +121,13 @@ export default function PetitionView() {
     };
 
     fetchSignatures();
-  }, [petition]); // Run fetchSignatures only when petition is set
+  }, [petition]);
 
   const handleVote = async (voteType: "up" | "down") => {
     if (!petition) return;
 
     const voteValue = voteType === "up";
 
-    // Get the current user
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -142,7 +137,6 @@ export default function PetitionView() {
       return;
     }
 
-    // Check if the user has already voted on this content
     const { data: existingVote, error: fetchError } = await supabase
       .schema("Forum")
       .from("ContentVotes")
@@ -158,7 +152,6 @@ export default function PetitionView() {
 
     if (existingVote) {
       if (existingVote.vote === voteValue) {
-        // Undo the vote
         const { error: deleteError } = await supabase
           .schema("Forum")
           .from("ContentVotes")
@@ -179,7 +172,6 @@ export default function PetitionView() {
 
         setUserVote(null);
       } else {
-        // Update the vote to the opposite type
         const { error: updateError } = await supabase
           .schema("Forum")
           .from("ContentVotes")
@@ -202,7 +194,6 @@ export default function PetitionView() {
         setUserVote(voteType);
       }
     } else {
-      // Insert a new vote
       const { error: insertError } = await supabase
         .schema("Forum")
         .from("ContentVotes")
@@ -249,9 +240,7 @@ export default function PetitionView() {
   const handleSign = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
     if (firstName && lastName && petition) {
-      // Ensure petition data is available
       try {
-        // Get the current user
         const {
           data: { user },
         } = await supabase.auth.getUser();
@@ -262,15 +251,13 @@ export default function PetitionView() {
           return;
         }
 
-        // Create the new signature object
         const newSignature = {
           f_name: firstName,
           l_name: lastName,
-          petition_id: petition.id, // Assuming petition ID is the content_id
+          petition_id: petition.id,
           user_id: user.id,
         };
 
-        // Insert the new signature into the database
         const { error } = await supabase
           .schema("Forum")
           .from("Signatures")
@@ -282,7 +269,6 @@ export default function PetitionView() {
           return;
         }
 
-        // Update local state
         setSignatures([
           ...signatures,
           {
@@ -292,7 +278,6 @@ export default function PetitionView() {
           },
         ]);
 
-        // Reset input fields
         setFirstName("");
         setLastName("");
         alert("Thank you for signing the petition!");

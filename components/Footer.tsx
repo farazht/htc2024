@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ThemeSwitcher } from "./theme-switcher";
+import { ThemeSwitcher } from "./ThemeSwitcher";
 import Logo from "./Logo.png";
 
 export const Footer = () => {

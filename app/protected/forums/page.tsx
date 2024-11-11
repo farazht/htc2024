@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
 import { createClient } from "../../../utils/supabase/client";
 import Link from "next/link";
 import {
@@ -11,7 +11,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/ui/Dropdown";
 import { ChevronDown, Search, ThumbsDown, ThumbsUp } from "lucide-react";
 
 const supabase = createClient();
@@ -21,7 +21,7 @@ type ForumPost = {
   title: string;
   rating: number;
   timestamp: Date;
-  content_type: string; // Add this based on your URL structure, or replace with correct field name
+  content_type: string;
 };
 
 export default function ForumSection() {
@@ -33,7 +33,7 @@ export default function ForumSection() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const { data, error } = await supabase.schema("Forum").from("Content") // Replace 'Content' with your actual table name
+        const { data, error } = await supabase.schema("Forum").from("Content")
           .select(`
             *,
             ContentVotes (
@@ -46,10 +46,8 @@ export default function ForumSection() {
           return;
         }
 
-        // Format the data to include the calculated rating
         const formattedData =
           data?.map((post) => {
-            // Sum the upvotes and downvotes from ContentVotes
             const rating = post.ContentVotes.reduce(
               (sum: number, vote: { vote: any }) => {
                 return sum + (vote.vote ? 1 : -1);
@@ -59,8 +57,8 @@ export default function ForumSection() {
 
             return {
               ...post,
-              timestamp: new Date(post.created_at), // Convert created_at to Date object
-              rating, // Add the calculated rating
+              timestamp: new Date(post.created_at),
+              rating,
             };
           }) || [];
 
@@ -72,8 +70,8 @@ export default function ForumSection() {
     };
 
     fetchPosts();
-  }, []); // Empty dependency array ensures this runs only once
-
+  }, []); 
+  
   const sortPosts = (posts: typeof forumPosts) => {
     switch (sortOption) {
       case "new":

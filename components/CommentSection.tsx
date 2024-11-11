@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 import CommentComponent from './CommentComponent';
 import { createClient } from "../utils/supabase/client";
 
@@ -29,30 +29,26 @@ async function fetchComments(contentID: number): Promise<Comment[]> {
 
     if (!commentsData) return [];
 
-    // Extract unique user_ids from comments
     const userIds = Array.from(new Set(commentsData.map(comment => comment.user_id)));
 
-    // Fetch usernames from UserEmails table
     const { data: usersData, error: usersError } = await supabase
       .schema('Forum')
       .from('UserEmails')
-      .select('user_id, user_email') // Adjust the column names as per your table
+      .select('user_id, user_email')
       .in('user_id', userIds);
 
     if (usersError) throw usersError;
 
-    // Create a mapping from user_id to username
     const userIdToUsername = new Map<number, string>();
     usersData?.forEach(user => {
       userIdToUsername.set(user.user_id, user.user_email);
     });
 
-    // Map commentsData to Comment type and assign usernames
     const comments = commentsData.map(item => ({
       ...item,
-      content: item.comment, // Map 'comment' to 'content'
+      content: item.comment,
       author: userIdToUsername.get(item.user_id) || 'Anonymous',
-      replies: [], // Initialize replies
+      replies: [],
     })) as Comment[];
 
     return comments;
@@ -102,14 +98,13 @@ export default function CommentSection({ content_id }: { content_id: number }) {
     const { data: { user } } = await supabase.auth.getUser();
 
     try {
-      // Insert into Supabase
       const { data, error } = await supabase
         .schema('Forum')
         .from('ForumComment')
         .insert([{ 
           content_id, 
           parent_id, 
-          comment: content,  // Database expects 'comment' field
+          comment: content,
           user_id: user?.id,
           created_at: new Date().toISOString(),
         }])
@@ -117,7 +112,6 @@ export default function CommentSection({ content_id }: { content_id: number }) {
 
       if (error) throw error;
 
-      // Fetch the username for the user_id
       const { data: userData, error: userError } = await supabase
         .schema('Forum')
         .from('UserEmails')
@@ -127,10 +121,9 @@ export default function CommentSection({ content_id }: { content_id: number }) {
 
       if (userError) throw userError;
 
-      // Map the inserted data to match the Comment type
       const addedComment = {
         ...data[0],
-        content: data[0].comment, // Map 'comment' to 'content'
+        content: data[0].comment,
         author: userData?.username || 'Anonymous',
         replies: [],
       } as Comment;

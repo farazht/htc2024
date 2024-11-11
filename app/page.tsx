@@ -1,7 +1,4 @@
-import Hero from "@/components/hero";
-import ConnectSupabaseSteps from "@/components/tutorial/connect-supabase-steps";
-import SignUpUserSteps from "@/components/tutorial/sign-up-user-steps";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { MessagesSquare, Scale, BookUser } from "lucide-react";
 import Link from "next/link";
 

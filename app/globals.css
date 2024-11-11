@@ -110,10 +110,9 @@
   animation: slideUp 0.5s ease-out forwards;
 }
 
-/* Add this to your CSS file */
 .separator {
-  height: 1px; /* Height of the separator */
-  background-color: #d1d5db; /* Light gray color */
-  margin: 8px 0; /* Vertical margin for spacing */
-  width: 100%; /* Full width */
+  height: 1px;
+  background-color: #d1d5db;
+  margin: 8px 0;
+  width: 100%;
 }

@@ -1,11 +1,9 @@
-// components/Chatbox.tsx
-
 'use client';
 
 import { useState } from 'react';
 import { X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import { HiSparkles } from 'react-icons/hi2';
 
 export default function Chatbox() {
@@ -55,7 +53,7 @@ export default function Chatbox() {
           const errorData = await response.json();
           console.error('Error response:', errorData);
           
-          // Check if the error indicates a quota issue
+          // check if the error indicates a quota issue
           if (errorData.message.includes('exceeded your quota')) {
             addMessage('You have exceeded your quota. Please check your billing details.', 'assistant');
           } else {

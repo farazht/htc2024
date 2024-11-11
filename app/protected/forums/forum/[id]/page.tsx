@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { ArrowBigUp, ArrowBigDown } from "lucide-react";
 import { createClient } from "../../../../../utils/supabase/client";
 import CommentSection from "@/components/CommentSection";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 
 type ForumPost = {
   id: number;
@@ -38,8 +38,8 @@ export default function ForumPostView() {
             )
           `
           )
-          .eq("id", 34) // Use dynamic ID as needed
-          .single(); // Fetch a single post
+          .eq("id", 34)
+          .single();
 
         if (error) {
           console.error("Error fetching post:", error);
@@ -47,7 +47,6 @@ export default function ForumPostView() {
         }
 
         if (data) {
-          // Use reduce to calculate upvotes and downvotes
           const { upvotes, downvotes } = data.ContentVotes?.reduce(
             (
               acc: { upvotes: number; downvotes: number },
@@ -63,12 +62,11 @@ export default function ForumPostView() {
             { upvotes: 0, downvotes: 0 }
           ) || { upvotes: 0, downvotes: 0 };
 
-          // Format post data
           const formattedPost: ForumPost = {
             id: data.id,
             title: data.title,
             description: data.description,
-            author: data.author || "Anonymous", // Fallback if author is missing
+            author: data.author || "Anonymous",
             rating: upvotes - downvotes,
             timestamp: new Date(data.created_at),
             content_type: data.content_type,
@@ -91,7 +89,6 @@ export default function ForumPostView() {
 
     const voteValue = voteType === "up";
 
-    // Get the current user
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -101,14 +98,13 @@ export default function ForumPostView() {
       return;
     }
 
-    // Check if the user has already voted on this content
     const { data: existingVote, error: fetchError } = await supabase
       .schema("Forum")
       .from("ContentVotes")
       .select("*")
       .eq("user_id", user.id)
       .eq("content_id", post.id)
-      .maybeSingle(); // Use maybeSingle() to avoid the error when no rows are returned
+      .maybeSingle();
 
     if (fetchError) {
       console.error("Error fetching existing vote:", fetchError);
@@ -116,9 +112,7 @@ export default function ForumPostView() {
     }
 
     if (existingVote) {
-      // User has already voted on this post
       if (existingVote.vote === voteValue) {
-        // If the existing vote matches the new vote type, undo the vote
         const { error: deleteError } = await supabase
           .schema("Forum")
           .from("ContentVotes")
@@ -130,7 +124,6 @@ export default function ForumPostView() {
           return;
         }
 
-        // Update state to reflect vote removal
         setPost((prevPost) => {
           if (!prevPost) return null;
           const updatedPost = { ...prevPost };
@@ -138,9 +131,8 @@ export default function ForumPostView() {
           return updatedPost;
         });
 
-        setUserVote(null); // Reset user vote state
+        setUserVote(null);
       } else {
-        // If the existing vote is opposite of the new vote type, update the vote
         const { error: updateError } = await supabase
           .schema("Forum")
           .from("ContentVotes")
@@ -152,7 +144,6 @@ export default function ForumPostView() {
           return;
         }
 
-        // Update state to reflect the new vote type
         setPost((prevPost) => {
           if (!prevPost) return null;
           const updatedPost = { ...prevPost };
@@ -161,10 +152,9 @@ export default function ForumPostView() {
           return updatedPost;
         });
 
-        setUserVote(voteType); // Set user vote state to new type
+        setUserVote(voteType);
       }
     } else {
-      // No existing vote, insert a new vote
       const { error: insertError } = await supabase
         .schema("Forum")
         .from("ContentVotes")
@@ -179,7 +169,6 @@ export default function ForumPostView() {
         return;
       }
 
-      // Update state to reflect new vote
       setPost((prevPost) => {
         if (!prevPost) return null;
         const updatedPost = { ...prevPost };
@@ -187,7 +176,7 @@ export default function ForumPostView() {
         return updatedPost;
       });
 
-      setUserVote(voteType); // Set user vote state to new type
+      setUserVote(voteType);
     }
   };
 

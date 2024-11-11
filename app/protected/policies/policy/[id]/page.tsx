@@ -60,7 +60,6 @@ export default function PolicyPage() {
 
           } catch (error) {
               console.error('Error retrieving policy ratings:', error);
-              // Set likes and dislikes to zero if an error occurs
               setLikes(0);
               setDislikes(0);
               console.log(likes, dislikes)
@@ -70,7 +69,6 @@ export default function PolicyPage() {
     fetchPolicyData();
 }, [id]);
 
-// Calculate percentage for the bar display
 const totalVotes = likes + dislikes;
 const likePercentage = totalVotes > 0 ? (likes / totalVotes) * 100 : 0;
 const dislikePercentage = totalVotes > 0 ? (dislikes / totalVotes) * 100 : 0;
@@ -82,7 +80,7 @@ const dislikePercentage = totalVotes > 0 ? (dislikes / totalVotes) * 100 : 0;
 //       const commentData = {
 //           content: newComment,
 //           policy_id: Number(id),
-//           author: 'CurrentUser', // Replace with actual user
+//           author: 'CurrentUser',
 //       };
 //       const { data, error } = await InsertComment(commentData);
 //       if (!error && data && data[0]) {
@@ -94,24 +92,20 @@ const dislikePercentage = totalVotes > 0 ? (dislikes / totalVotes) * 100 : 0;
 
 
 const handleLike = async () => {
-  const userId = await RetrieveUserId(); // Retrieve the user ID
+  const userId = await RetrieveUserId();
   if (userId) {
     console.log(userId);
     
-    // Check for existing like/dislike and delete if it exists
     const existingVote = await checkForLikeDislike(userId, Number(id));
     
-    // Now insert the new like
-    const result = await InsertLikesDislikes(userId, 1, Number(id)); // Pass userId, feedback, and policyId
+    const result = await InsertLikesDislikes(userId, 1, Number(id));
 
-    // Check if result is not null before accessing error
     if (result && !result.error) {
       setLikes(likes + 1);
       setHasLiked(true);
-      setHasDisliked(false); // Reset dislike state
+      setHasDisliked(false); 
       if (existingVote) {
-        // If there was an existing vote, adjust likes/dislikes accordingly
-        setDislikes(dislikes - 1); // Decrease dislikes if they were previously disliked
+        setDislikes(dislikes - 1);
       }
     } else {
       console.error('Error inserting like/dislike:', result?.error);
@@ -122,21 +116,18 @@ const handleLike = async () => {
 };
 
 const handleDislike = async () => {
-  const userId = await RetrieveUserId(); // Retrieve the user ID
+  const userId = await RetrieveUserId();
   if (userId) {
     const existingVote = await checkForLikeDislike(userId, Number(id));
     
-    // Now insert the new dislike
-    const result = await InsertLikesDislikes(userId, -1, Number(id)); // Pass userId, feedback, and policyId
+    const result = await InsertLikesDislikes(userId, -1, Number(id));
 
-    // Check if result is not null before accessing error
     if (result && !result.error) {
       setDislikes(dislikes + 1);
       setHasDisliked(true);
-      setHasLiked(false); // Reset like state
+      setHasLiked(false);
       if (existingVote) {
-        // If there was an existing vote, adjust likes/dislikes accordingly
-        setLikes(likes - 1); // Decrease likes if they were previously liked
+        setLikes(likes - 1);
       }
     } else {
       console.error('Error inserting like/dislike:', result?.error);

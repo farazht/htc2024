@@ -1,4 +1,6 @@
-// env-chatbox.mjs
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// env.mjs : VALIDATES REQUIRED ENVIRONMENT VARIABLES FOR AI
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 import { z } from 'zod';
 

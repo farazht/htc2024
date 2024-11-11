@@ -7,12 +7,13 @@ import {
   DropdownMenuContent,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/ui/Dropdown";
 import Map from "@/components/Map";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 
 const Representatives: React.FC = () => {
-  const [selection, setSelection] = useState("Ward"); // Default to "Ward"
+  // ward is default state
+  const [selection, setSelection] = useState("Ward"); 
 
   const handleSelectionChange = (value: string) => {
     setSelection(value);

@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/Button"
+import { Input } from "@/components/ui/Input"
 
 type Comment = {
   id: number
@@ -103,7 +103,7 @@ export default function CommentSection() {
 
   return (
     <div className="max-w-2xl mx-auto p-4">
-      {/* Top-level Comment Input */}
+      {/* top-level comment input */}
       <form onSubmit={handleSubmit} className="mb-8">
         <div className="flex space-x-2">
           <Input
@@ -115,7 +115,7 @@ export default function CommentSection() {
           <Button type="submit">Comment</Button>
         </div>
       </form>
-      {/* Render Comments */}
+      {/* render comments */}
       <div className="space-y-4">
         {comments.map((comment) => (
           <CommentComponent 

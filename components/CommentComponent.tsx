@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 
 type Comment = {
   id: number;
@@ -65,8 +65,6 @@ function CommentComponent({
         <div className="ml-8 mt-2">
           {comment.replies.map((reply, index) => (
             <div key={reply.id}>
-              {/* <div className="separator" /> */}
-
               <CommentComponent comment={reply} onReply={onReply} />
               {index < comment.replies.length - 1}
             </div>

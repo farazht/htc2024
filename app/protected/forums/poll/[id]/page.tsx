@@ -17,7 +17,7 @@ type Poll = {
   user_id: number;
   upvotes: number;
   downvotes: number;
-  options: { id: string; text: string; votes: number }[]; // Adjust as needed
+  options: { id: string; text: string; votes: number }[]; 
 };
 
 type PollChoice = {
@@ -39,7 +39,7 @@ export default function PollVotingPage() {
   const [pollChoices, setPollChoices] = useState<PollChoice[]>([])
 
   useEffect(() => {
-    // Fetch poll data and vote counts
+    
     async function fetchPollData() {
       const { data: pollData, error: pollError } = await supabase
         .schema('Forum')
@@ -52,22 +52,20 @@ export default function PollVotingPage() {
         console.error("Error fetching poll:", pollError);
         return;
       }
-  
-      // Map pollData to match the Poll type structure with default values for undefined fields
+      
       const mappedPost: Poll = {
         id: pollData.id,
         created_at: pollData.created_at,
-        author_id: pollData.author_id,  // Will update this with user_email later
+        author_id: pollData.author_id,  
         description: pollData.description || "",
         content_type: pollData.content_type || "poll",
         title: pollData.title || "",
         user_id: pollData.user_id || 0,
-        upvotes: 0,  // Temporary values, to be updated after fetching counts
+        upvotes: 0,  
         downvotes: 0,
         options: pollData.options || [],
       };
-  
-      // Fetch the upvote count
+
       const { count: upvoteCount, error: upvoteError } = await supabase
         .schema('Forum')
         .from('ContentVotes')
@@ -80,7 +78,6 @@ export default function PollVotingPage() {
         return;
       }
   
-      // Fetch the downvote count
       const { count: downvoteCount, error: downvoteError } = await supabase
         .schema('Forum')
         .from('ContentVotes')
@@ -93,7 +90,7 @@ export default function PollVotingPage() {
         return;
       }
   
-      // Fetch the author's email
+      
       const { data: userEmailData, error: userEmailError } = await supabase
         .schema('Forum')
         .from('UserEmails')
@@ -105,11 +102,9 @@ export default function PollVotingPage() {
         console.error("Error fetching user email:", userEmailError);
         return;
       }
-  
-      // Update the author_id with the user's email if it was fetched successfully
+      
       const authorEmail = userEmailData ? userEmailData.user_email : mappedPost.author_id;
-  
-      // Update poll data with vote counts and author email
+      
       const updatedPoll = {
         ...mappedPost,
         upvotes: upvoteCount || 0,
@@ -127,7 +122,6 @@ export default function PollVotingPage() {
   
   useEffect(() => {
     async function fetchPollOptions() {
-      // First query to get all poll choices
       const { data: choicesData, error: choicesError } = await supabase
         .schema('Forum')
         .from('PollChoice')
@@ -140,7 +134,6 @@ export default function PollVotingPage() {
       }
 
       if (choicesData) {
-        // For each choice, fetch the count of votes from PollVotes
         const choicesWithVotes = await Promise.all(
           choicesData.map(async (choice) => {
             const { data: votesData, error: votesError } = await supabase
@@ -154,7 +147,6 @@ export default function PollVotingPage() {
               return { ...choice, votes: 0 };
             }
 
-            // Use the exact count of votes
             const votes = votesData.length || 0;
             return { ...choice, votes };
           })
@@ -167,9 +159,6 @@ export default function PollVotingPage() {
     fetchPollOptions();
   }, [pollId, supabase]);
   
-  
-  
-  // Second useEffect to fetch user email based on user_id from poll data
   useEffect(() => {
     async function fetchUserEmail() {
     }
@@ -177,14 +166,11 @@ export default function PollVotingPage() {
     fetchUserEmail();
   }, [post?.user_id, supabase]);
   
-  
-
   const handleVote = async (voteType: 'up' | 'down') => {
     if (!post) return;
 
     const voteValue = voteType === 'up';
-
-    // Get the current user
+    
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -194,7 +180,6 @@ export default function PollVotingPage() {
       return;
     }
 
-    // Check if the user has already voted on this content
     const { data: existingVote, error: fetchError } = await supabase
       .schema('Forum')
       .from('ContentVotes')
@@ -210,7 +195,6 @@ export default function PollVotingPage() {
 
     if (existingVote) {
       if (existingVote.vote === voteValue) {
-        // Undo the vote
         const { error: deleteError } = await supabase
           .schema('Forum')
           .from('ContentVotes')
@@ -222,7 +206,6 @@ export default function PollVotingPage() {
           return;
         }
 
-        // Update state
         setPost((prevPost) => {
           if (!prevPost) return null;
           return {
@@ -234,7 +217,6 @@ export default function PollVotingPage() {
 
         setUserVote(null);
       } else {
-        // Change the vote
         const { error: updateError } = await supabase
           .schema('Forum')
           .from('ContentVotes')
@@ -246,7 +228,6 @@ export default function PollVotingPage() {
           return;
         }
 
-        // Update state
         setPost((prevPost) => {
           if (!prevPost) return null;
           return {
@@ -259,7 +240,6 @@ export default function PollVotingPage() {
         setUserVote(voteType);
       }
     } else {
-      // Insert a new vote
       const { error: insertError } = await supabase
         .schema('Forum')
         .from('ContentVotes')
@@ -274,7 +254,7 @@ export default function PollVotingPage() {
         return;
       }
 
-      // Update state
+
       setPost((prevPost) => {
         if (!prevPost) return null;
         return {
@@ -319,10 +299,8 @@ export default function PollVotingPage() {
   
     const userId = userData.user.id;
   
-    // Get all poll choice IDs for this poll
     const pollChoiceIds = pollChoices.map((choice) => choice.id);
-  
-    // Check if the user has already voted in this poll
+    
     const { data: existingVote, error: fetchError } = await supabase
       .schema('Forum')
       .from('PollVotes')
@@ -337,7 +315,6 @@ export default function PollVotingPage() {
     }
   
     if (existingVote) {
-      // User has already voted; update their vote to the new selection
       const previousChoiceId = existingVote.poll_choice_id;
   
       const { error: updateError } = await supabase
@@ -351,7 +328,6 @@ export default function PollVotingPage() {
         return;
       }
   
-      // Update state: decrement previous choice's votes and increment new choice's votes
       setPollChoices((prevChoices) =>
         prevChoices.map((choice) => {
           if (choice.id === previousChoiceId) {
@@ -364,7 +340,6 @@ export default function PollVotingPage() {
         })
       );
     } else {
-      // User hasn't voted yet; insert a new vote
       const { error: insertError } = await supabase
         .schema('Forum')
         .from('PollVotes')
@@ -378,7 +353,6 @@ export default function PollVotingPage() {
         return;
       }
   
-      // Update state: increment the selected choice's votes
       setPollChoices((prevChoices) =>
         prevChoices.map((choice) =>
           choice.id === selectedOption
@@ -386,9 +360,7 @@ export default function PollVotingPage() {
             : choice
         )
       );
-    }
-  
-    // After voting, set hasVoted to true
+    }    
     setHasVoted(true);
   };
   
